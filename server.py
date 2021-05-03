@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 from flask import Flask, request, redirect, url_for, render_template_string
 import json
 import base64
