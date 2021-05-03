@@ -28,10 +28,10 @@ class ClientCFG(object):
         self.path = None
         self.tls = None
 
-    def __str__(self) -> str:
+    def __str__(self):
         return json.dumps(self.__dict__)
 
-    def loads(self, input: str):
+    def loads(self, input):
         cfg = json.loads(input)
         inbounds = cfg['inbounds']
         settings = inbounds[0]['settings']
@@ -46,7 +46,7 @@ class ClientCFG(object):
         self.path = streamSettings['wsSettings']['path']
         self.net = streamSettings['network']
 
-    def dumps(self) -> str:
+    def dumps(self):
         return json.dumps(self.__dict__)
 
 
