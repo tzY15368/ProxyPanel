@@ -46,7 +46,7 @@ run `curl -s -w %{http_code} -o /dev/null -d "$(cat /etc/v2ray/v2ray.json|base64
 
 ## step3
 
-visit [http://127.0.0.1:5000/panel/editor](http://127.0.0.1:5000/panel/editor) to edit config, submit to save config
+visit [https://[YOUR-DOMAIN]/panel/editor](https://[YOUR-DOMAIN]/panel/editor) to edit config, submit to save config
 
 ## step4
 
