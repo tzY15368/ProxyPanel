@@ -1,0 +1,21 @@
+{
+    "type":"worker",
+    "heartBeatRatePerSec":1,
+    "workerCFG":{
+        "nic":"eth0",
+        "workerHost":"127.0.0.1",
+        "workerPort":1235,
+        "masterIP":"1.1.1.1",
+        "masterPort":1234,
+        "heartBeatErrorThres":5,
+        "logPath":"."
+    },
+    "masterCFG":{
+        "workerHeartBeatMissThres":5,
+        "db":"panel.db",
+        "host":"0.0.0.0",
+        "port":1236,
+        "rpcHost":"0.0.0.0",
+        "rpcPort":1237
+    }
+}
