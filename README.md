@@ -10,37 +10,39 @@
 ## 架构与实现细节
 
 - Panel Master
-直连延迟最低的某节点，便于用户和admin操作
+跑在firebase/其他云/最低延迟服上，中控节点 (单点故障)
 
 - Panel Worker
-其他节点，通过心跳报活，同时拉取新配置、同步用户订阅状态
+所有普通节点，通过心跳向master报活，同时拉取新配置（同步用户订阅状态）  
 
-### 用户数据
-
-- 数据在Panel master上，其他Panel Instance拉配置并apply，【可能的单点故障】
+如果拉不到状态则默认deny all 
 
 ### nginx鉴权
 
-- v2ray单端口部署ws+tls，通过path里的query参数进redis里查订阅过期时间
+- v2ray单端口部署ws+tls，使用access_by_lua做实时鉴权，用path里的query参数向本地Panel worker查询过期时间
 
 - 不做流控、审计
 
-### 管理面板整个上云Pros & Cons
+## Proxy Panel Instances设计
 
-#### Cons
+### Panel Worker
 
-- 额外成本?
+- golang写，二进制可直接部署
+- 所有信息只留在内存中，重启后需要向panel master重新拉取
+- 向内网lua提供http(tcp?)接口用于鉴权（只使用状态码）
+- 向外网panel master发心跳，多次超时则认为master down，deny all access，心跳还包含当前资源使用情况: CPU, MEM，带宽，并发数
+- 需要部署时无感支持ipv4和v6
+- 配置文件：panel master ip和端口，心跳频率，masterDownTimeoutCountThres
 
-- 至少需要两套key：一套只读数据库给worker用，一套读写给master用，配置和运维更复杂?
+### Panel Master
 
-#### Pros
+- 接受proxy worker上报数据，持久化，可生成监控图，同时响应中增量更新配置信息（至少实现配置是否有更新，如果有则附上配置）
+- 业务配置信息存储：redis，用key的expire实现过期；
+- 注册信息同样redis即可。需要在redis上做事务
 
-- 额外成本可能非常小
+- 如果用云原生，如firebase：需要重新设计订阅过期：加个expireAt字段，服务端下发时进行计算（数据量大了之后可能会有性能问题）
+- 本地存的话sqlite就够了，低写较低读。
 
-- master不会有CPU压力，由于无状态，也不再需要master，不再存在单点故障
+### RPC
 
-- 配合部署脚本使用的话会更方便，节点部署后可以自动向面板注册
-
-#### Questions
-
-- 起一个定时脚本拉订阅清单直接查读文件/查redis/查云上数据库不确定哪个开销更小 <- redis会多一个进程（服务）运行在单核机器上（都跑了v2ray和nginx了，还差个redis？），文件是阻塞操作会严重影响性能，直接访问云上数据库不知道是否会对体验有大影响，反正只有第一次建立连接的时候需要
+- gRPC+SSL
