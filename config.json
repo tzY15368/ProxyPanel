@@ -8,7 +8,10 @@
         "workerHost":"127.0.0.1",
         "workerPort":1235,
         "masterIP":"1.1.1.1",
-        "masterPort":1234
+        "masterPort":1234,
+        "address":"hello.lazarus",
+        "host":"hello.host.lazarus",
+        "ps":"lazarushk-fast"
     },
     "master":{
         "enabled":true,
