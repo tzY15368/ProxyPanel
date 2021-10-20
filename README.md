@@ -53,4 +53,4 @@
 
 ### RPC
 
-- gRPC+SSL
+- thrift+SSL
