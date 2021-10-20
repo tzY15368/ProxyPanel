@@ -1,17 +1,17 @@
 {
-    "type":"worker",
     "heartBeatRatePerSec":1,
-    "workerCFG":{
-        "nic":"eth0",
+    "heartBeatErrorThres":5,
+    "logPath":".",
+    "worker":{
+        "enabled":true,
+        "nicName":"eth0",
         "workerHost":"127.0.0.1",
         "workerPort":1235,
         "masterIP":"1.1.1.1",
-        "masterPort":1234,
-        "heartBeatErrorThres":5,
-        "logPath":"."
+        "masterPort":1234
     },
-    "masterCFG":{
-        "workerHeartBeatMissThres":5,
+    "master":{
+        "enabled":false,
         "db":"panel.db",
         "host":"0.0.0.0",
         "port":1236,
