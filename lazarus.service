@@ -1,0 +1,15 @@
+[Unit]
+Description=V2ray nodes subscription manager
+After=network.target
+
+[Service]
+KillSignal=SIGQUIT
+ExecStart=/opt/lazarus/run.sh
+Restart=always
+Environment=GIN_MODE=release
+Type=notify
+NotifyAccess=all
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
