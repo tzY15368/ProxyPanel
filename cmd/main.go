@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/tzY15368/proxypanel/config"
+	"github.com/tzY15368/proxypanel/master"
+	"github.com/tzY15368/proxypanel/worker"
 )
 
 func main() {
@@ -15,9 +17,11 @@ func main() {
 	}
 
 	if cfg.Master.Enabled {
-
+		master.StartMaster(cfg.Master)
 	}
 	if cfg.Worker.Enabled {
-
+		worker.StartWorker(cfg.Worker)
 	}
+
+	select {}
 }

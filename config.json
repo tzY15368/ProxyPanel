@@ -11,7 +11,7 @@
         "masterPort":1234
     },
     "master":{
-        "enabled":false,
+        "enabled":true,
         "db":"panel.db",
         "host":"0.0.0.0",
         "port":1236,
