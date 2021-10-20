@@ -1,4 +1,4 @@
-module github.com/tzY15368/proxypanel
+module github.com/tzY15368/lazarus
 
 go 1.15
 

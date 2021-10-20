@@ -1,21 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tzY15368/proxypanel/config"
-	"github.com/tzY15368/proxypanel/master"
-	"github.com/tzY15368/proxypanel/worker"
+	"github.com/tzY15368/lazarus/config"
+	"github.com/tzY15368/lazarus/master"
+	"github.com/tzY15368/lazarus/worker"
 )
 
 func main() {
 
 	cfg, err := config.InitConfig()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.Fatal(err)
 	}
 
 	if cfg.Master.Enabled {

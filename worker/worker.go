@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tzY15368/proxypanel/config"
+	"github.com/tzY15368/lazarus/config"
 )
 
 // gin server for internal user auth service

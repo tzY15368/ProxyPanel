@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/tzY15368/proxypanel/config"
-	"github.com/tzY15368/proxypanel/master/models"
+	"github.com/tzY15368/lazarus/config"
+	"github.com/tzY15368/lazarus/master/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
