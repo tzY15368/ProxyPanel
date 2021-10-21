@@ -13,6 +13,11 @@ import (
 	"github.com/tzY15368/lazarus/master/models"
 )
 
+func ServeHomeHTML(c *gin.Context) {
+	c.File("html/panel.html")
+	c.Abort()
+}
+
 func LoginRequired(c *gin.Context) {
 	session := sessions.Default(c)
 	fmt.Println(session.Get("id"))
@@ -79,17 +84,16 @@ func UpdateSubscription(c *gin.Context) {
 }
 
 func HandleSubscription(c *gin.Context) {
-	needJSON := c.Query("json") != ""
 	token := c.Param("token")
-	if needJSON {
-		c.JSON(http.StatusOK, servers.Servers)
-	} else {
-		data, err := servers.GenSubscriptionData(token)
-		if err != nil {
-			c.Status(http.StatusForbidden)
-			return
-		}
-		c.String(http.StatusOK, data)
+	data, err := servers.GenSubscriptionData(token)
+	if err != nil {
+		c.Status(http.StatusForbidden)
+		return
 	}
+	c.String(http.StatusOK, data)
 	c.Abort()
+}
+
+func HandleSubscriptionJSON(c *gin.Context) {
+	c.AbortWithStatusJSON(http.StatusOK, servers.Servers)
 }
