@@ -3,7 +3,7 @@
     "heartBeatErrorThres":5,
     "logPath":".",
     "worker":{
-        "enabled":true,
+        "enabled":false,
         "nicName":"eth0",
         "workerHost":"127.0.0.1",
         "workerPort":1235,
