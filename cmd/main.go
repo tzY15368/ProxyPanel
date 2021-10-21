@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
@@ -19,14 +20,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	logrus.Info("config is read")
 
 	if cfg.Master.Enabled {
-		master.StartMaster(cfg.Master)
-		logrus.Infof("started master %v\n", cfg.Master)
+		master.StartMaster()
 	}
 	if cfg.Worker.Enabled {
-		worker.StartWorker(cfg.Worker)
-		logrus.Infof("started worker %v\n", cfg.Worker)
+		// make sure worker starts after master
+		time.Sleep(2 * time.Second)
+		worker.StartWorker()
 	}
 
 	select {}
