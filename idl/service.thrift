@@ -32,16 +32,13 @@ struct HeartbeatResponse {
     1:required bool hasUpdate;
 
     // 如果hasupdate==true，则master必须提供新的sessionid
-    2:required string sessionID;
+    2:optional string sessionID;
 
     // 如果hasupdate==true，应用data中的filter
-    2:optional UserData data;
+    3:optional UserData data;
 }
 
-service HeartbeatService {
-    HeartbeatResponse DoHeartBeat(1:HeartbeatRequest hbr)
-}
-
-service RegisterServerService {
+service LazarusService {
     HeartbeatResponse DoRegisterServer(1:RegisterRequest rr)
+    HeartbeatResponse DoHeartBeat(1:HeartbeatRequest hbr)
 }

@@ -1,3 +1,6 @@
+github.com/apache/thrift v0.15.0 h1:aGvdaR0v1t9XLgjtBYwxcBvBOTMqClzwE26CHOgjW1Y=
+github.com/apache/thrift/lib/go/thrift v0.0.1-do-not-use h1:xsANrjjFgHGZdvm+CH11MokyE+otra0nzE6s6h4AYao=
+github.com/apache/thrift/lib/go/thrift v0.0.1-do-not-use/go.mod h1:DFhKuRr6Y5sTnmWbwMaNNsb2Sb191zcHZCUmz+x3YsM=
 github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff/go.mod h1:+RTT1BOk5P97fT2CiHkbFQwkK3mjsFAP6zCYV2aXtjw=
 github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668/go.mod h1:H0wQNHz2YrLsuXOZozoeDmnHXkNCRmMW0gwFWDfEZDA=
 github.com/bradleypeabody/gorilla-sessions-memcache v0.0.0-20181103040241-659414f458e1/go.mod h1:dkChI7Tbtx7H1Tj7TqGSZMOeGpMP5gLHtjroHd4agiI=

@@ -54,3 +54,4 @@
 ### RPC
 
 - thrift+SSL
+- `thrift -r  --gen go idl/service.thrift`
