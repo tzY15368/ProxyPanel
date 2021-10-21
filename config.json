@@ -19,6 +19,7 @@
         "host":"0.0.0.0",
         "port":1236,
         "rpcHost":"0.0.0.0",
-        "rpcPort":1237
+        "rpcPort":1237,
+        "secret":"do not go gentle into that good night"
     }
 }

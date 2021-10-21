@@ -8,7 +8,8 @@ import (
 
 type User struct {
 	gorm.Model
-	Email    string
-	Password string
-	ExpireAt time.Time
+	Email    string    `json:"email"`
+	Token    string    `json:"token";sql:"index"`
+	Password string    `json:"-"`
+	ExpireAt time.Time `json:"expire_at"`
 }

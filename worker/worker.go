@@ -23,8 +23,8 @@ func StartWorker(cfg *config.WorkerCFG) {
 func authHandler(c *gin.Context) {
 	token := c.Param("token")
 	if _, ok := authFilterMap[token]; ok {
-		c.String(http.StatusOK, "")
+		c.Status(http.StatusOK)
 	} else {
-		c.String(http.StatusForbidden, "")
+		c.Status(http.StatusForbidden)
 	}
 }

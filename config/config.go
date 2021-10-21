@@ -5,22 +5,24 @@ import (
 	"os"
 )
 
+var Cfg *Config
+
 func InitConfig() (*Config, error) {
-	cfg := &Config{}
 	file, err := os.Open("config.json")
+	if err != nil {
+		return nil, err
+	}
 	defer file.Close()
 
-	if err != nil {
-		return nil, err
-	}
+	Cfg = &Config{}
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(cfg)
+	err = decoder.Decode(Cfg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return cfg, nil
+	return Cfg, nil
 }
 
 type Config struct {
@@ -44,6 +46,7 @@ type MasterCFG struct {
 	Enabled bool
 	Db      string
 	Host    string
+	Secret  string
 	Port    int
 	RpcHost string
 	RpcPort int

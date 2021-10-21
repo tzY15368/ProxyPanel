@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02 15:03:04",
+	})
 
 	cfg, err := config.InitConfig()
 	if err != nil {

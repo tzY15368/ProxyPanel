@@ -2,21 +2,21 @@ package master
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
+	"github.com/tzY15368/lazarus/master/handlers"
 	"github.com/tzY15368/lazarus/master/models"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+
+	// 导入session存储引擎
+	"github.com/gin-contrib/sessions/cookie"
 )
 
 // gin server for handling business
 var externalG *gin.Engine
-
-// db conn
-var db *gorm.DB
 
 func say(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "helo")
@@ -24,15 +24,20 @@ func say(ctx *gin.Context) {
 
 func StartMaster(cfg *config.MasterCFG) {
 	// seteup db
-	var err error
-	db, err = gorm.Open(sqlite.Open(cfg.Db), &gorm.Config{})
+	err := models.SetupDB(cfg.Db)
 	if err != nil {
-		logrus.Fatal("db connection error:", err)
+		log.Fatal("db conn error", err)
 	}
 
-	db.AutoMigrate(&models.User{})
-
 	externalG = gin.Default()
+	sessionStore := cookie.NewStore([]byte(cfg.Secret))
+
+	externalG.Use(sessions.Sessions("masterSession", sessionStore))
 	externalG.GET("/", say)
+	externalG.GET("/login", handlers.LoginHandler)
+	externalG.GET("/logout", handlers.LogoutHandler)
+	externalG.GET("/update", handlers.LoginRequired, handlers.UpdateSubscription)
+	externalG.GET("/user", handlers.LoginRequired, handlers.UserInfoHandler)
+	externalG.GET("/s/:token", handlers.HandleSubscription)
 	go externalG.Run(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
 }

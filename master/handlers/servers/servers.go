@@ -71,6 +71,7 @@ func GenSubscriptionData(uid string) (string, error) {
 		result += base64.StdEncoding.EncodeToString(b)
 		result += "\n"
 	}
+	logrus.Infof("generating subscription for %d servers", len(Servers))
 	return base64.StdEncoding.EncodeToString([]byte(result)), nil
 }
 
