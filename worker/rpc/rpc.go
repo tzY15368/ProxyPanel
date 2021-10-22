@@ -42,8 +42,6 @@ func handleHeartbeatResponse(res *RPCService.HeartbeatResponse) {
 			r[v] = struct{}{}
 		}
 		auth.SetMap(r)
-	} else {
-		logrus.Info("no update on config")
 	}
 }
 
