@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,6 +27,13 @@ type ServerData struct {
 	Path string `json:"path"`
 	Type string `json:"type"`
 	Port int    `json:"port"`
+
+	lastHeartBeat time.Time `json:"-"`
+	cpu           int       `json:"-"`
+	mem           int       `json:"-"`
+	tcp           int       `json:"-"`
+	dataQuota     int       `json:"-"`
+	dataTotal     int       `json:"-"`
 }
 
 func newServerData(add string, host string, ps string) ServerData {
@@ -41,14 +50,28 @@ func newServerData(add string, host string, ps string) ServerData {
 		Path: "/index.php",
 		Type: "none",
 		Port: PORT,
+
+		lastHeartBeat: time.Now(),
 	}
 
 	return sd
 }
 
-func RegisterServer(add string, host string, ps string) {
+func RegisterServer(add string, host string, ps string) string {
 	serverKey := fmt.Sprintf("%s-%s-%d", add, host, PORT)
-	Servers[serverKey] = newServerData(add, host, ps)
+	logrus.Infof("registered server: %s", serverKey)
+	sessionID := uuid.New().String()
+	Servers[sessionID] = newServerData(add, host, ps)
+	return sessionID
+}
+
+func RegisterHeartbeat(sessionID string) {
+	if data, ok := Servers[sessionID]; ok {
+		data.lastHeartBeat = time.Now()
+		Servers[sessionID] = data
+	} else {
+		logrus.Warn("inexistent session id ", sessionID)
+	}
 }
 
 // 生成v2ray订阅格式的base64编码字符串

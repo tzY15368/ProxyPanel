@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/master/handlers/servers"
+	"github.com/tzY15368/lazarus/master/handlers/user"
 	"github.com/tzY15368/lazarus/master/models"
 )
 
@@ -20,7 +21,6 @@ func ServeHomeHTML(c *gin.Context) {
 
 func LoginRequired(c *gin.Context) {
 	session := sessions.Default(c)
-	fmt.Println(session.Get("id"))
 	if session.Get("id") == nil {
 		c.Status(http.StatusForbidden)
 		c.Abort()
@@ -53,32 +53,21 @@ func LoginHandler(c *gin.Context) {
 }
 
 func UserInfoHandler(c *gin.Context) {
-	var user models.User
-	session := sessions.Default(c)
-	err := models.DB.First(&user, "id=?", session.Get("id")).Error
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	c.AbortWithStatusJSON(http.StatusOK, user)
+	u := user.GetCurrentUser(c)
+	c.AbortWithStatusJSON(http.StatusOK, u)
 }
 
 func UpdateSubscription(c *gin.Context) {
-	session := sessions.Default(c)
-	var user models.User
-	err := models.DB.First(&user, "id=?", session.Get("id")).Error
-	if err != nil {
-		c.AbortWithError(http.StatusForbidden, err)
-	}
+	u := user.GetCurrentUser(c)
 	now := time.Now()
-	if now.After(user.ExpireAt) {
-		user.ExpireAt = now
+	if now.After(u.ExpireAt) {
+		u.ExpireAt = now
 	}
-	newExpireDate := user.ExpireAt.AddDate(0, 0, 30)
-	models.DB.Model(&user).Update("expire_at", newExpireDate)
+	newExpireDate := u.ExpireAt.AddDate(0, 0, 30)
+	models.DB.Model(&u).Update("expire_at", newExpireDate)
 	logrus.WithFields(logrus.Fields{
-		"email":    user.Email,
-		"expireat": user.ExpireAt,
+		"email":    u.Email,
+		"expireat": u.ExpireAt,
 	})
 	c.AbortWithStatus(http.StatusOK)
 }
@@ -96,4 +85,12 @@ func HandleSubscription(c *gin.Context) {
 
 func HandleSubscriptionJSON(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusOK, servers.Servers)
+}
+
+func HandleTokenRefresh(c *gin.Context) {
+	u := user.GetCurrentUser(c)
+	err := models.DB.Model(&u).Update("token", uuid.New().String()).Error
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+	}
 }
