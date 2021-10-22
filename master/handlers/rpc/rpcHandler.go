@@ -13,7 +13,7 @@ type LazarusService struct {
 
 func (ls *LazarusService) DoRegisterServer(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.HeartbeatResponse, _err error) {
 	sessionId := servers.RegisterServer(rr.Add, rr.Host, rr.Ps)
-
+	auth.ChangeAuthMap()
 	_r = &RPCService.HeartbeatResponse{
 		HasUpdate: true,
 		SessionID: &sessionId,
@@ -26,10 +26,15 @@ func (ls *LazarusService) DoHeartBeat(ctx context.Context, hbr *RPCService.Heart
 
 	sessionID := hbr.SessionID
 	servers.RegisterHeartbeat(sessionID)
+	authMapDidChange := auth.AuthMapDidChange()
 	res = &RPCService.HeartbeatResponse{
-		HasUpdate: true,
-		Data:      auth.GetUserMap(),
+		HasUpdate: authMapDidChange,
 		SessionID: &sessionID,
+	}
+	if authMapDidChange {
+		res.Data = auth.GetUserMap()
+	} else {
+		res.Data = RPCService.UserData{}
 	}
 	return
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -9,6 +10,27 @@ import (
 	"github.com/tzY15368/lazarus/master/models"
 	"gorm.io/gorm"
 )
+
+var mapDidChange bool
+var mapMutex sync.Mutex
+
+func ChangeAuthMap() {
+	mapMutex.Lock()
+	defer mapMutex.Unlock()
+	mapDidChange = true
+}
+
+func AuthMapDidChange() bool {
+	mapMutex.Lock()
+	defer mapMutex.Unlock()
+	if mapDidChange {
+		mapDidChange = false
+		return true
+	} else {
+		mapDidChange = false
+		return false
+	}
+}
 
 func TokenIsValid(token string) bool {
 	var user models.User

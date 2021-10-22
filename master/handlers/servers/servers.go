@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"github.com/tzY15368/lazarus/config"
 )
 
 var Servers map[string]ServerData
@@ -43,7 +44,7 @@ func newServerData(add string, host string, ps string) ServerData {
 		Host: host,
 		Ps:   ps,
 		// 此时通用ID似乎不合适
-		Id:   "7b796c05-6552-4764-87ce-c406641a04a2",
+		Id:   "3a789def-7ed6-4df9-81c4-815252d8b79d",
 		V:    "2",
 		Aid:  0,
 		Net:  "ws",
@@ -100,4 +101,15 @@ func GenSubscriptionData(uid string) (string, error) {
 
 func init() {
 	Servers = make(map[string]ServerData)
+	go func() {
+		for {
+			for sessionid, server := range Servers {
+				if time.Now().Sub(server.lastHeartBeat) > time.Second*time.Duration(config.Cfg.HeartBeatRateIntervalSec*config.Cfg.HeartBeatErrorThres) {
+					logrus.Warnf("timeout on server %s", server.Host)
+					delete(Servers, sessionid)
+				}
+			}
+			time.Sleep(2 * time.Second)
+		}
+	}()
 }
