@@ -8,41 +8,71 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
 	"github.com/tzY15368/lazarus/gen-go/RPCService"
+	"github.com/tzY15368/lazarus/worker/auth"
 )
 
 var ctx = context.TODO()
 
-func getRegistryClient() (*RPCService.LazarusServiceClient, error) {
+var rpcClient *RPCService.LazarusServiceClient
+
+var sessionID string
+
+func getRPCClient() error {
 	addr := fmt.Sprintf("%s:%d", config.Cfg.Worker.MasterIP, config.Cfg.Worker.MasterPort)
 	transport, err := thrift.NewTSocket(addr)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
 	if err := transport.Open(); err != nil {
-		return nil, err
+		return err
 	}
 	iprot := protocolFactory.GetProtocol(transport)
 	oprot := protocolFactory.GetProtocol(transport)
-	client := RPCService.NewLazarusServiceClient(thrift.NewTStandardClient(iprot, oprot))
-	return client, nil
+	rpcClient = RPCService.NewLazarusServiceClient(thrift.NewTStandardClient(iprot, oprot))
+	return nil
+}
+
+func handleHeartbeatResponse(res *RPCService.HeartbeatResponse) {
+	sessionID = *res.SessionID
+	if res.HasUpdate {
+		logrus.Info("has update on config")
+		r := make(map[string]struct{})
+		for _, v := range res.Data {
+			r[v] = struct{}{}
+		}
+		auth.SetMap(r)
+	} else {
+		logrus.Info("no update on config")
+	}
 }
 
 func RegisterSelf() error {
-	client, err := getRegistryClient()
+	err := getRPCClient()
 	if err != nil {
 		return err
 	}
-	res, err := client.DoRegisterServer(ctx, &RPCService.RegisterRequest{
-		Add:  "123",
-		Host: "456",
-		Ps:   "bbb",
+	res, err := rpcClient.DoRegisterServer(ctx, &RPCService.RegisterRequest{
+		Add:  config.Cfg.Worker.Address,
+		Host: config.Cfg.Worker.Host,
+		Ps:   config.Cfg.Worker.PS,
 	})
 	if err != nil {
-		panic(err)
 		return err
 	}
-	_ = res
-	logrus.Info("res", res)
+	logrus.WithField("sessionID", *res.SessionID).Info("got session id")
+	handleHeartbeatResponse(res)
+
+	return nil
+}
+
+func SendHeartBeat() error {
+	res, err := rpcClient.DoHeartBeat(ctx, &RPCService.HeartbeatRequest{
+		SessionID: sessionID,
+	})
+	if err != nil {
+		return err
+	}
+	handleHeartbeatResponse(res)
 	return nil
 }
