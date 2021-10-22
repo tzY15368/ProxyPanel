@@ -45,13 +45,20 @@
 ### Panel Master
 
 - 接受proxy worker上报数据，持久化，可生成监控图，同时响应中增量更新配置信息（至少实现配置是否有更新，如果有则附上配置）
-- 业务配置信息存储：redis，用key的expire实现过期；
-- 注册信息同样redis即可。需要在redis上做事务
 
-- 如果用云原生，如firebase：需要重新设计订阅过期：加个expireAt字段，服务端下发时进行计算（数据量大了之后可能会有性能问题）
-- 本地存的话sqlite就够了，低写较低读。
+- 设计订阅过期：expireAt字段，服务端每次下发时进行计算（数据量大了之后可能会有性能问题）
+- sqlite持久化用户数据(低写较低读)。
 
 ### RPC
 
 - thrift+SSL
 - `thrift -r  --gen go idl/service.thrift`
+
+## Deploy
+
+```
+cd lazarus
+cp lazarus.service /usr/lib/systemd/system/lazarus.service
+systemctl daemon-reload
+systemctl start lazarus.service
+```

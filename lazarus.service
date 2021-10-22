@@ -4,10 +4,12 @@ After=network.target
 
 [Service]
 KillSignal=SIGQUIT
-ExecStart=/opt/lazarus/run.sh
-Restart=always
+WorkingDirectory=/opt/lazarus
+ExecStart=/opt/lazarus/main
 Environment=GIN_MODE=release
-Type=notify
+Restart=always
+RestartSec=30
+Type=simple
 NotifyAccess=all
 StandardError=syslog
 
