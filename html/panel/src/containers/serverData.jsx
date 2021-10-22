@@ -2,33 +2,37 @@ import React from 'react';
 import errorHandler from "../utils/errorHandler";
 export default function ServerData(){
     function fetchServers(){
-        fetch("/lazarus/s/json").then().catch(errorHandler)
+        fetch("/lazarus/s/json").then(res=>res.json()).then(res=>{
+            setServers(res)
+        }).catch(errorHandler)
     }
     React.useEffect(()=>{
         fetchServers()
-        setTimeout(()=>{
-            setServers([1,2,3])
-        },2000)
     },[])
-    const [servers,setServers] = React.useState([])
-    return servers.length?<div>
-        <ul className="list-group list-group-horizontal">
-            <li className="list-group-item">Host</li>
-            <li className="list-group-item">CPU</li>
-            <li className="list-group-item">Mem</li>
-            <li className="list-group-item">Active Connections</li>
-            <li className="list-group-item">Data Quota</li>
-        </ul>
-        {servers.map(value => {
-            return (
-                <ul className="list-group list-group-horizontal">
-                    <li className="list-group-item">An item</li>
-                    <li className="list-group-item">A second item</li>
-                    <li className="list-group-item">A third item</li>
-                    <li className="list-group-item">A third item</li>
-                    <li className="list-group-item">A third item</li>
-                </ul>
-            )
-        })}
-    </div>:<>Loading...</>
+    const [servers,setServers] = React.useState({})
+    return Object.keys(servers).length?
+        <table className="table">
+            <thead>
+            <tr>
+                <th scope="col">host</th>
+                <th scope="col">cpu%</th>
+                <th scope="col">mem%</th>
+                <th scope="col">tcp connections</th>
+                <th scope={"col"}>data</th>
+            </tr>
+            </thead>
+            <tbody>
+            {Object.values(servers).map(value => {
+                return (
+                    <tr>
+                        <td>{value.host}</td>
+                        <td>{value.cpu}</td>
+                        <td>{value.mem}</td>
+                        <td>{value.tcp}</td>
+                        <td>{value.dataTotal}/{value.dataQuota}</td>
+                    </tr>
+                )
+            })}
+            </tbody>
+        </table> :<>Loading...</>
 }

@@ -21,7 +21,7 @@
             let a = prompt("email").trim()
             console.log("email is ",a)
             fetch(`/lazarus/login?email=${a}`).then(res=>{
-                res.ok? setTimeout(()=>{window.location.href="/lazarus/home"},500) : alert("刷新后重试")
+                res.ok? setTimeout(()=>{window.location.href="/lazarus/home/index.html"},500) : alert("刷新后重试")
             }).catch(err=>{
                 console.log(err)
                 alert("刷新后重试")

@@ -2,7 +2,7 @@ import React from 'react';
 import errorHandler from "../utils/errorHandler";
 
 let ud = {"ID":1,"CreatedAt":"2021-10-21T23:04:45.3150016+02:00","UpdatedAt":"2021-10-21T23:44:08.6927611+02:00","DeletedAt":null,"email":"nathanzy15@gmail.com","token":"","expire_at":"2021-11-20T23:44:08.6927611+01:00"}
-
+const baseName = "https://journalist.fmagic.icu/lazarus/s/"
 function Spinner(){
     return <div className="spinner-border" role="status">
         <span className="sr-only">Loading...</span>
@@ -27,6 +27,10 @@ export default function UserInfo() {
         user?<div>
             <h3>Hello, {user.email}</h3>
             <p>过期时间: {user.expire_at}</p>
+            <p>订阅链接: <a href={baseName + user.token}>{baseName + user.token}</a></p>
+            {/*{user.token?<></>:*/}
+            {/*    <button onClick={flush} className={"btn btn-warning"}>*/}
+            {/*</button>}*/}
             <div><button onClick={update} className={"btn btn-primary"}>再续一个月</button> {updating?<Spinner/>:<></>}</div>
         </div>:<>Loading...</>
     )
