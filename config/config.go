@@ -26,20 +26,24 @@ func InitConfig() (*Config, error) {
 }
 
 type Config struct {
-	HeartBeatRatePerSec int
-	HeartBeatErrorThres int
-	LogPath             string
-	Worker              *WorkerCFG
-	Master              *MasterCFG
+	HeartBeatRateIntervalSec int
+	HeartBeatErrorThres      int
+	LogPath                  string
+	Worker                   *WorkerCFG
+	Master                   *MasterCFG
 }
 
 type WorkerCFG struct {
-	Enabled    bool
-	NicName    string
-	WorkerHost string
-	WorkerPort int
-	MasterIP   string
-	MasterPort int
+	Enabled     bool
+	NicName     string
+	WorkerHost  string
+	WorkerPort  int
+	MasterIP    string
+	MasterPort  int
+	Address     string
+	Host        string
+	PS          string
+	TotalDataMB int32
 }
 
 type MasterCFG struct {

@@ -1,17 +1,18 @@
 {
-    "heartBeatRatePerSec":1,
+    "heartBeatRateIntervalSec":1,
     "heartBeatErrorThres":5,
     "logPath":".",
     "worker":{
-        "enabled":false,
+        "enabled":true,
         "nicName":"eth0",
         "workerHost":"127.0.0.1",
-        "workerPort":1235,
+        "workerPort":1238,
         "masterIP":"127.0.0.1",
-        "masterPort":1237,
-        "address":"hello.lazarus",
-        "host":"hello.host.lazarus",
-        "ps":"lazarushk-fast"
+        "masterPort":8000,
+        "address":"hello2.lazarus",
+        "host":"hello2.host.lazarus",
+        "ps":"lazarushk-fast2",
+        "totalDataMB":13000
     },
     "master":{
         "enabled":true,
@@ -19,7 +20,7 @@
         "host":"0.0.0.0",
         "port":1236,
         "rpcHost":"0.0.0.0",
-        "rpcPort":1237,
+        "rpcPort":8000,
         "secret":"do not go gentle into that good night"
     }
 }
