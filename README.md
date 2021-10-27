@@ -12,8 +12,10 @@
 
 ### 二阶段
 
-- 配置其他机器key后自动部署v2ray和worker实例
+- 配置其他机器key后自动部署v2ray,nginx和worker实例
 - terraform自动买机器扩容
+- 所有worker的域名为四级域名([WORKERID].xxx.xxx.xxx)，从master在的三级域名由master做动态解析，worker只需master的RPC地址即可工作，避免复杂配置  
+- dockerize，使扩容更容易
 
 ## 架构与实现细节
 
@@ -23,7 +25,7 @@
 - Panel Worker
 所有普通节点，通过心跳向master报活，同时拉取新配置（同步用户订阅状态）  
 
-如果拉不到状态则默认deny all 
+如果拉不到状态则默认deny all  
 
 ### nginx鉴权
 
@@ -39,8 +41,15 @@
 - 所有信息只留在内存中，重启后需要向panel master重新拉取
 - 向内网lua提供http(tcp?)接口用于鉴权（只使用状态码）
 - 向外网panel master发心跳，多次超时则认为master down，deny all access，心跳还包含当前资源使用情况: CPU, MEM，带宽，并发数
-- 需要部署时无感支持ipv4和v6
+- 需要部署时支持ipv4和v6
 - 配置文件：panel master ip和端口，心跳频率，masterDownTimeoutCountThres
+
+#### worker 时间轴
+
+- worker启动时向配置文件中提供的master RPC地址进行服务注册，若注册失败则退出
+- worker启动后向master定期发带自身负载数据的心跳包
+- master发生故障（worker多次心跳超时）后worker直接退出进程
+- 进程退出后由进程管理器（一阶段systemd，二阶段docker/其他）重启
 
 ### Panel Master
 
@@ -56,7 +65,7 @@
 
 ## Deploy
 
-```
+```bash
 cd lazarus
 cp lazarus.service /usr/lib/systemd/system/lazarus.service
 systemctl daemon-reload
