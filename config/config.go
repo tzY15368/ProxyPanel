@@ -7,8 +7,8 @@ import (
 
 var Cfg *Config
 
-func InitConfig() (*Config, error) {
-	file, err := os.Open("config.json")
+func InitConfig(path string) (*Config, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +29,7 @@ type Config struct {
 	HeartBeatRateIntervalSec int
 	HeartBeatErrorThres      int
 	LogPath                  string
+	LogLevel                 string
 	Worker                   *WorkerCFG
 	Master                   *MasterCFG
 }

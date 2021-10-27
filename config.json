@@ -1,7 +1,8 @@
 {
     "heartBeatRateIntervalSec":1,
     "heartBeatErrorThres":5,
-    "logPath":".",
+    "logPath":"server.log",
+    "logLevel":"debug",
     "worker":{
         "enabled":true,
         "nicName":"eth0",
