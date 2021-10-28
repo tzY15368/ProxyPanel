@@ -16,9 +16,9 @@ import (
 var internalG *gin.Engine
 
 func StartWorker() {
-	err := rpc.RegisterSelf()
+	err := rpc.Startup()
 	if err != nil {
-		// service would be unreachable if not registered
+		// service should be unreachable if not registered
 		logrus.Fatal(err)
 	}
 
@@ -54,5 +54,4 @@ func authHandler(c *gin.Context) {
 	} else {
 		c.AbortWithStatus(http.StatusForbidden)
 	}
-	return
 }

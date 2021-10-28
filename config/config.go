@@ -45,6 +45,7 @@ type WorkerCFG struct {
 	Host        string
 	PS          string
 	TotalDataMB int32
+	MasterAddr  string
 }
 
 type MasterCFG struct {

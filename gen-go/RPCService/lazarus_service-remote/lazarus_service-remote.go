@@ -22,7 +22,8 @@ func Usage() {
   fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
-  fmt.Fprintln(os.Stderr, "  HeartbeatResponse DoRegisterServer(RegisterRequest rr)")
+  fmt.Fprintln(os.Stderr, "  InitializeResponse DoInitialize(InitializeRequest ir)")
+  fmt.Fprintln(os.Stderr, "  RegisterResponse DoRegister(RegisterRequest rr)")
   fmt.Fprintln(os.Stderr, "  HeartbeatResponse DoHeartBeat(HeartbeatRequest hbr)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
@@ -146,29 +147,54 @@ func main() {
   }
   
   switch cmd {
-  case "DoRegisterServer":
+  case "DoInitialize":
     if flag.NArg() - 1 != 1 {
-      fmt.Fprintln(os.Stderr, "DoRegisterServer requires 1 args")
+      fmt.Fprintln(os.Stderr, "DoInitialize requires 1 args")
       flag.Usage()
     }
-    arg12 := flag.Arg(1)
-    mbTrans13 := thrift.NewTMemoryBufferLen(len(arg12))
-    defer mbTrans13.Close()
-    _, err14 := mbTrans13.WriteString(arg12)
-    if err14 != nil {
+    arg16 := flag.Arg(1)
+    mbTrans17 := thrift.NewTMemoryBufferLen(len(arg16))
+    defer mbTrans17.Close()
+    _, err18 := mbTrans17.WriteString(arg16)
+    if err18 != nil {
       Usage()
       return
     }
-    factory15 := thrift.NewTJSONProtocolFactory()
-    jsProt16 := factory15.GetProtocol(mbTrans13)
-    argvalue0 := RPCService.NewRegisterRequest()
-    err17 := argvalue0.Read(context.Background(), jsProt16)
-    if err17 != nil {
+    factory19 := thrift.NewTJSONProtocolFactory()
+    jsProt20 := factory19.GetProtocol(mbTrans17)
+    argvalue0 := RPCService.NewInitializeRequest()
+    err21 := argvalue0.Read(context.Background(), jsProt20)
+    if err21 != nil {
       Usage()
       return
     }
     value0 := argvalue0
-    fmt.Print(client.DoRegisterServer(context.Background(), value0))
+    fmt.Print(client.DoInitialize(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "DoRegister":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "DoRegister requires 1 args")
+      flag.Usage()
+    }
+    arg22 := flag.Arg(1)
+    mbTrans23 := thrift.NewTMemoryBufferLen(len(arg22))
+    defer mbTrans23.Close()
+    _, err24 := mbTrans23.WriteString(arg22)
+    if err24 != nil {
+      Usage()
+      return
+    }
+    factory25 := thrift.NewTJSONProtocolFactory()
+    jsProt26 := factory25.GetProtocol(mbTrans23)
+    argvalue0 := RPCService.NewRegisterRequest()
+    err27 := argvalue0.Read(context.Background(), jsProt26)
+    if err27 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    fmt.Print(client.DoRegister(context.Background(), value0))
     fmt.Print("\n")
     break
   case "DoHeartBeat":
@@ -176,19 +202,19 @@ func main() {
       fmt.Fprintln(os.Stderr, "DoHeartBeat requires 1 args")
       flag.Usage()
     }
-    arg18 := flag.Arg(1)
-    mbTrans19 := thrift.NewTMemoryBufferLen(len(arg18))
-    defer mbTrans19.Close()
-    _, err20 := mbTrans19.WriteString(arg18)
-    if err20 != nil {
+    arg28 := flag.Arg(1)
+    mbTrans29 := thrift.NewTMemoryBufferLen(len(arg28))
+    defer mbTrans29.Close()
+    _, err30 := mbTrans29.WriteString(arg28)
+    if err30 != nil {
       Usage()
       return
     }
-    factory21 := thrift.NewTJSONProtocolFactory()
-    jsProt22 := factory21.GetProtocol(mbTrans19)
+    factory31 := thrift.NewTJSONProtocolFactory()
+    jsProt32 := factory31.GetProtocol(mbTrans29)
     argvalue0 := RPCService.NewHeartbeatRequest()
-    err23 := argvalue0.Read(context.Background(), jsProt22)
-    if err23 != nil {
+    err33 := argvalue0.Read(context.Background(), jsProt32)
+    if err33 != nil {
       Usage()
       return
     }

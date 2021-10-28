@@ -1,16 +1,29 @@
+// thrift -r  --gen go idl/service.thrift
 namespace go RPCService
 
 typedef set<string> UserData
 
-struct RegisterRequest {
-    // 默认所有实例都跑在/index.php 443端口
+struct InitializeRequest {
+    1:required string mac;
+}
+
+struct InitializeResponse{
     1:required string add;
     2:required string host;
-    3:required string ps;
+}
+
+struct RegisterRequest {
+    // 默认所有实例都跑在/index.php 443端口
+    1:required string mac;
+}
+
+struct RegisterResponse {
+    1:required i32 heartBeatRateIntervalSec;
+    2:required i32 HeartBeatErrorThres;
 }
 
 struct HeartbeatRequest {
-    1:required string sessionID;
+    1:required string mac;
 
     // cpu占用百分比
     4:optional i32 cpu;
@@ -31,14 +44,12 @@ struct HeartbeatRequest {
 struct HeartbeatResponse {
     1:required bool hasUpdate;
 
-    // 如果hasupdate==true，则master必须提供新的sessionid
-    2:optional string sessionID;
-
     // 如果hasupdate==true，应用data中的filter
-    3:optional UserData data;
+    2:optional UserData data;
 }
 
 service LazarusService {
-    HeartbeatResponse DoRegisterServer(1:RegisterRequest rr)
+    InitializeResponse DoInitialize(1:InitializeRequest ir)
+    RegisterResponse DoRegister(1:RegisterRequest rr)
     HeartbeatResponse DoHeartBeat(1:HeartbeatRequest hbr)
 }

@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/google/uuid v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
-	github.com/shirou/gopsutil v3.21.9+incompatible // indirect
+	github.com/shirou/gopsutil v3.21.9+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	gorm.io/driver/sqlite v1.1.6

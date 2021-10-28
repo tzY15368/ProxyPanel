@@ -13,7 +13,8 @@
         "address":"hello2.lazarus",
         "host":"hello2.host.lazarus",
         "ps":"lazarushk-fast2",
-        "totalDataMB":13000
+        "totalDataMB":13000,
+        "masterAddr":"127.0.0.1:8000"
     },
     "master":{
         "enabled":true,
