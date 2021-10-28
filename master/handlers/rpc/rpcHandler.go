@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 
+	"github.com/tzY15368/lazarus/config"
 	"github.com/tzY15368/lazarus/gen-go/RPCService"
 	"github.com/tzY15368/lazarus/master/auth"
 	"github.com/tzY15368/lazarus/master/handlers/servers"
@@ -11,25 +12,28 @@ import (
 type LazarusService struct {
 }
 
-func (ls *LazarusService) DoRegisterServer(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.HeartbeatResponse, _err error) {
-	sessionId := servers.RegisterServer(rr.Add, rr.Host, rr.Ps)
+func DoInitialize(ctx context.Context, rr *RPCService.InitializeRequest) (res *RPCService.InitializeResponse, _err error) {
+	return
+}
+
+func (ls *LazarusService) DoRegisterServer(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.RegisterResponse, _err error) {
+	_err = servers.RegisterServer(rr.IP)
+	if _err != nil {
+		return
+	}
 	auth.ChangeAuthMap()
-	_r = &RPCService.HeartbeatResponse{
-		HasUpdate: true,
-		SessionID: &sessionId,
-		Data:      auth.GetUserMap(),
+	_r = &RPCService.RegisterResponse{
+		HeartBeatRateIntervalSec: int32(config.Cfg.HeartBeatRateIntervalSec),
+		HeartBeatErrorThres:      int32(config.Cfg.HeartBeatErrorThres),
 	}
 	return
 }
 
 func (ls *LazarusService) DoHeartBeat(ctx context.Context, hbr *RPCService.HeartbeatRequest) (res *RPCService.HeartbeatResponse, err error) {
-
-	sessionID := hbr.SessionID
-	servers.RegisterHeartbeat(sessionID)
+	servers.RegisterHeartbeat(hbr.IP)
 	authMapDidChange := auth.AuthMapDidChange()
 	res = &RPCService.HeartbeatResponse{
 		HasUpdate: authMapDidChange,
-		SessionID: &sessionID,
 	}
 	if authMapDidChange {
 		res.Data = auth.GetUserMap()

@@ -3,20 +3,26 @@ package servers
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"sort"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
 )
 
-var Servers map[string]ServerData
+var Servers = make(map[string]*ServerData)
+
+var ErrServerNotFound = errors.New("err server not found")
+var ErrServerExists = errors.New("err server exists")
 
 const PORT = 443
 
 type ServerData struct {
+	*ServerConfig
+	*ServerMetric
+}
+type ServerConfig struct {
 	Tls  string `json:"tls"`
 	Ps   string `json:"ps"`
 	Add  string `json:"add"`
@@ -28,23 +34,42 @@ type ServerData struct {
 	Path string `json:"path"`
 	Type string `json:"type"`
 	Port int    `json:"port"`
+
+	created       bool
+	registered    bool
+	ipv6          bool
+	lastHeartBeat time.Time `json:"-"`
 }
 
 type ServerMetric struct {
-	lastHeartBeat time.Time `json:"-"`
-	cpu           int       `json:"-"`
-	mem           int       `json:"-"`
-	tcp           int       `json:"-"`
-	dataQuota     int       `json:"-"`
-	dataTotal     int       `json:"-"`
+	cpu       int `json:"-"`
+	mem       int `json:"-"`
+	tcp       int `json:"-"`
+	dataQuota int `json:"-"`
+	dataTotal int `json:"-"`
 }
 
-func newServerData(add string, host string, ps string) ServerData {
-	sd := ServerData{
+type CreateServerParams struct {
+	Ip   string `josn:"ip"`
+	Add  string `json:"add"`
+	Host string `json:"host"`
+	Ps   string `json:"ps"`
+}
+
+func CreateServer(params *CreateServerParams) error {
+	if _, ok := Servers[params.Ip]; ok {
+		return ErrServerExists
+	}
+	Servers[params.Ip] = newServer(params)
+	return nil
+}
+
+func newServer(params *CreateServerParams) *ServerData {
+	sc := ServerConfig{
 		Tls:  "tls",
-		Add:  add,
-		Host: host,
-		Ps:   ps,
+		Add:  params.Add,
+		Host: params.Host,
+		Ps:   params.Ps,
 		// 此时通用ID似乎不合适
 		Id:   "3a789def-7ed6-4df9-81c4-815252d8b79d",
 		V:    "2",
@@ -55,26 +80,32 @@ func newServerData(add string, host string, ps string) ServerData {
 		Port: PORT,
 
 		lastHeartBeat: time.Now(),
+		registered:    false,
+		ipv6:          false,
 	}
-
+	sd := &ServerData{
+		ServerConfig: &sc,
+		ServerMetric: &ServerMetric{},
+	}
 	return sd
 }
 
-func RegisterServer(add string, host string, ps string) string {
-	serverKey := fmt.Sprintf("%s-%s-%d", add, host, PORT)
-	logrus.Infof("registered server: %s", serverKey)
-	sessionID := uuid.New().String()
-	Servers[sessionID] = newServerData(add, host, ps)
-	return sessionID
+func RegisterServer(ip string) error {
+	if server, ok := Servers[ip]; ok {
+		server.registered = true
+		logrus.Infof("server %s was registered", server.Host)
+		return nil
+	}
+	return ErrServerNotFound
 }
 
-func RegisterHeartbeat(sessionID string) {
-	if data, ok := Servers[sessionID]; ok {
-		data.lastHeartBeat = time.Now()
-		Servers[sessionID] = data
-	} else {
-		logrus.Warn("inexistent session id ", sessionID)
+func RegisterHeartbeat(ip string) error {
+	if server, ok := Servers[ip]; ok {
+		server.lastHeartBeat = time.Now()
+		return nil
 	}
+	logrus.Warn("non-existent ip", ip)
+	return ErrServerNotFound
 }
 
 // 生成v2ray订阅格式的base64编码字符串
@@ -102,7 +133,6 @@ func GenSubscriptionData(uid string) (string, error) {
 }
 
 func init() {
-	Servers = make(map[string]ServerData)
 	go func() {
 		for {
 			for sessionid, server := range Servers {

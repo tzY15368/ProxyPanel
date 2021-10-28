@@ -22,9 +22,9 @@ type UserData []string
 func UserDataPtr(v UserData) *UserData { return &v }
 
 // Attributes:
-//  - Mac
+//  - IP
 type InitializeRequest struct {
-  Mac string `thrift:"mac,1,required" db:"mac" json:"mac"`
+  IP string `thrift:"ip,1,required" db:"ip" json:"ip"`
 }
 
 func NewInitializeRequest() *InitializeRequest {
@@ -32,15 +32,15 @@ func NewInitializeRequest() *InitializeRequest {
 }
 
 
-func (p *InitializeRequest) GetMac() string {
-  return p.Mac
+func (p *InitializeRequest) GetIP() string {
+  return p.IP
 }
 func (p *InitializeRequest) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
-  var issetMac bool = false;
+  var issetIP bool = false;
 
   for {
     _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
@@ -54,7 +54,7 @@ func (p *InitializeRequest) Read(ctx context.Context, iprot thrift.TProtocol) er
         if err := p.ReadField1(ctx, iprot); err != nil {
           return err
         }
-        issetMac = true
+        issetIP = true
       } else {
         if err := iprot.Skip(ctx, fieldTypeId); err != nil {
           return err
@@ -72,8 +72,8 @@ func (p *InitializeRequest) Read(ctx context.Context, iprot thrift.TProtocol) er
   if err := iprot.ReadStructEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
-  if !issetMac{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Mac is not set"));
+  if !issetIP{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field IP is not set"));
   }
   return nil
 }
@@ -82,7 +82,7 @@ func (p *InitializeRequest)  ReadField1(ctx context.Context, iprot thrift.TProto
   if v, err := iprot.ReadString(ctx); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
-  p.Mac = v
+  p.IP = v
 }
   return nil
 }
@@ -101,12 +101,12 @@ func (p *InitializeRequest) Write(ctx context.Context, oprot thrift.TProtocol) e
 }
 
 func (p *InitializeRequest) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "mac", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:mac: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.Mac)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.mac (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "ip", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ip: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.IP)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ip (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:mac: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ip: ", p), err) }
   return err
 }
 
@@ -116,7 +116,7 @@ func (p *InitializeRequest) Equals(other *InitializeRequest) bool {
   } else if p == nil || other == nil {
     return false
   }
-  if p.Mac != other.Mac { return false }
+  if p.IP != other.IP { return false }
   return true
 }
 
@@ -276,9 +276,9 @@ func (p *InitializeResponse) String() string {
 }
 
 // Attributes:
-//  - Mac
+//  - IP
 type RegisterRequest struct {
-  Mac string `thrift:"mac,1,required" db:"mac" json:"mac"`
+  IP string `thrift:"ip,1,required" db:"ip" json:"ip"`
 }
 
 func NewRegisterRequest() *RegisterRequest {
@@ -286,15 +286,15 @@ func NewRegisterRequest() *RegisterRequest {
 }
 
 
-func (p *RegisterRequest) GetMac() string {
-  return p.Mac
+func (p *RegisterRequest) GetIP() string {
+  return p.IP
 }
 func (p *RegisterRequest) Read(ctx context.Context, iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
-  var issetMac bool = false;
+  var issetIP bool = false;
 
   for {
     _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
@@ -308,7 +308,7 @@ func (p *RegisterRequest) Read(ctx context.Context, iprot thrift.TProtocol) erro
         if err := p.ReadField1(ctx, iprot); err != nil {
           return err
         }
-        issetMac = true
+        issetIP = true
       } else {
         if err := iprot.Skip(ctx, fieldTypeId); err != nil {
           return err
@@ -326,8 +326,8 @@ func (p *RegisterRequest) Read(ctx context.Context, iprot thrift.TProtocol) erro
   if err := iprot.ReadStructEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
-  if !issetMac{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Mac is not set"));
+  if !issetIP{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field IP is not set"));
   }
   return nil
 }
@@ -336,7 +336,7 @@ func (p *RegisterRequest)  ReadField1(ctx context.Context, iprot thrift.TProtoco
   if v, err := iprot.ReadString(ctx); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
-  p.Mac = v
+  p.IP = v
 }
   return nil
 }
@@ -355,12 +355,12 @@ func (p *RegisterRequest) Write(ctx context.Context, oprot thrift.TProtocol) err
 }
 
 func (p *RegisterRequest) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "mac", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:mac: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.Mac)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.mac (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "ip", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ip: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.IP)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ip (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:mac: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ip: ", p), err) }
   return err
 }
 
@@ -370,7 +370,7 @@ func (p *RegisterRequest) Equals(other *RegisterRequest) bool {
   } else if p == nil || other == nil {
     return false
   }
-  if p.Mac != other.Mac { return false }
+  if p.IP != other.IP { return false }
   return true
 }
 
@@ -530,14 +530,14 @@ func (p *RegisterResponse) String() string {
 }
 
 // Attributes:
-//  - Mac
+//  - IP
 //  - CPU
 //  - Mem
 //  - ActiveConn
 //  - CurrentData
 //  - TotalData
 type HeartbeatRequest struct {
-  Mac string `thrift:"mac,1,required" db:"mac" json:"mac"`
+  IP string `thrift:"ip,1,required" db:"ip" json:"ip"`
   // unused fields # 2 to 3
   CPU *int32 `thrift:"cpu,4" db:"cpu" json:"cpu,omitempty"`
   Mem *int32 `thrift:"mem,5" db:"mem" json:"mem,omitempty"`
@@ -551,8 +551,8 @@ func NewHeartbeatRequest() *HeartbeatRequest {
 }
 
 
-func (p *HeartbeatRequest) GetMac() string {
-  return p.Mac
+func (p *HeartbeatRequest) GetIP() string {
+  return p.IP
 }
 var HeartbeatRequest_CPU_DEFAULT int32
 func (p *HeartbeatRequest) GetCPU() int32 {
@@ -614,7 +614,7 @@ func (p *HeartbeatRequest) Read(ctx context.Context, iprot thrift.TProtocol) err
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
-  var issetMac bool = false;
+  var issetIP bool = false;
 
   for {
     _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
@@ -628,7 +628,7 @@ func (p *HeartbeatRequest) Read(ctx context.Context, iprot thrift.TProtocol) err
         if err := p.ReadField1(ctx, iprot); err != nil {
           return err
         }
-        issetMac = true
+        issetIP = true
       } else {
         if err := iprot.Skip(ctx, fieldTypeId); err != nil {
           return err
@@ -696,8 +696,8 @@ func (p *HeartbeatRequest) Read(ctx context.Context, iprot thrift.TProtocol) err
   if err := iprot.ReadStructEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
-  if !issetMac{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Mac is not set"));
+  if !issetIP{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field IP is not set"));
   }
   return nil
 }
@@ -706,7 +706,7 @@ func (p *HeartbeatRequest)  ReadField1(ctx context.Context, iprot thrift.TProtoc
   if v, err := iprot.ReadString(ctx); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
-  p.Mac = v
+  p.IP = v
 }
   return nil
 }
@@ -775,12 +775,12 @@ func (p *HeartbeatRequest) Write(ctx context.Context, oprot thrift.TProtocol) er
 }
 
 func (p *HeartbeatRequest) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "mac", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:mac: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.Mac)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.mac (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "ip", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ip: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.IP)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ip (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:mac: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ip: ", p), err) }
   return err
 }
 
@@ -850,7 +850,7 @@ func (p *HeartbeatRequest) Equals(other *HeartbeatRequest) bool {
   } else if p == nil || other == nil {
     return false
   }
-  if p.Mac != other.Mac { return false }
+  if p.IP != other.IP { return false }
   if p.CPU != other.CPU {
     if p.CPU == nil || other.CPU == nil {
       return false

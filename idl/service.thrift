@@ -4,7 +4,7 @@ namespace go RPCService
 typedef set<string> UserData
 
 struct InitializeRequest {
-    1:required string mac;
+    1:required string ip;
 }
 
 struct InitializeResponse{
@@ -14,7 +14,7 @@ struct InitializeResponse{
 
 struct RegisterRequest {
     // 默认所有实例都跑在/index.php 443端口
-    1:required string mac;
+    1:required string ip;
 }
 
 struct RegisterResponse {
@@ -23,7 +23,7 @@ struct RegisterResponse {
 }
 
 struct HeartbeatRequest {
-    1:required string mac;
+    1:required string ip;
 
     // cpu占用百分比
     4:optional i32 cpu;
