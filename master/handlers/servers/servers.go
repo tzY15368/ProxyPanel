@@ -90,6 +90,17 @@ func newServer(params *CreateServerParams) *ServerData {
 	return sd
 }
 
+func GetInitializeParams(ip string) (*CreateServerParams, error) {
+	if server, ok := Servers[ip]; ok {
+		csp := CreateServerParams{}
+		csp.Add = server.Add
+		csp.Host = server.Host
+		csp.Ps = server.Ps
+		return &csp, nil
+	}
+	return nil, ErrServerNotFound
+}
+
 func RegisterServer(ip string) error {
 	if server, ok := Servers[ip]; ok {
 		server.registered = true

@@ -12,11 +12,17 @@ import (
 type LazarusService struct {
 }
 
-func DoInitialize(ctx context.Context, rr *RPCService.InitializeRequest) (res *RPCService.InitializeResponse, _err error) {
+func (ls *LazarusService) DoInitialize(ctx context.Context, rr *RPCService.InitializeRequest) (res *RPCService.InitializeResponse, _err error) {
+	params, _err := servers.GetInitializeParams(rr.IP)
+	if _err != nil {
+		return nil, _err
+	}
+	res.Add = params.Add
+	res.Host = params.Host
 	return
 }
 
-func (ls *LazarusService) DoRegisterServer(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.RegisterResponse, _err error) {
+func (ls *LazarusService) DoRegister(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.RegisterResponse, _err error) {
 	_err = servers.RegisterServer(rr.IP)
 	if _err != nil {
 		return
