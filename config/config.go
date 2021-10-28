@@ -39,13 +39,8 @@ type WorkerCFG struct {
 	NicName     string
 	WorkerHost  string
 	WorkerPort  int
-	MasterIP    string
-	MasterPort  int
-	Address     string
-	Host        string
-	PS          string
-	TotalDataMB int32
 	MasterAddr  string
+	TotalDataMB int32
 }
 
 type MasterCFG struct {

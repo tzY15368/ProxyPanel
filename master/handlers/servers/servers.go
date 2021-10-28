@@ -28,7 +28,9 @@ type ServerData struct {
 	Path string `json:"path"`
 	Type string `json:"type"`
 	Port int    `json:"port"`
+}
 
+type ServerMetric struct {
 	lastHeartBeat time.Time `json:"-"`
 	cpu           int       `json:"-"`
 	mem           int       `json:"-"`
