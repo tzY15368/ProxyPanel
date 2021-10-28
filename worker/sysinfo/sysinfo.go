@@ -9,8 +9,11 @@ import (
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
+	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
 )
+
+var OutboundIP string
 
 func GetCPUPercent() int32 {
 	p, err := cpu.Percent(50*time.Millisecond, false)
@@ -62,4 +65,17 @@ func GetMacAddr() (addr string) {
 		}
 	}
 	return
+}
+
+func init() {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	OutboundIP = localAddr.IP.String()
+	logrus.Info("worker starting with outboundip ", OutboundIP)
 }

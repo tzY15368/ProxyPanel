@@ -46,7 +46,7 @@ func Startup() (e error) {
 }
 func mustInitializeServer() error {
 	res, err := rpcClient.DoInitialize(ctx, &RPCService.InitializeRequest{
-		Mac: sysinfo.GetMacAddr(),
+		IP: sysinfo.OutboundIP,
 	})
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func mustInitializeServer() error {
 
 func mustRegisterSelf() error {
 	res, err := rpcClient.DoRegister(ctx, &RPCService.RegisterRequest{
-		Mac: sysinfo.GetMacAddr(),
+		IP: sysinfo.OutboundIP,
 	})
 	config.Cfg.HeartBeatErrorThres = int(res.HeartBeatErrorThres)
 	config.Cfg.HeartBeatRateIntervalSec = int(res.HeartBeatRateIntervalSec)
@@ -77,7 +77,7 @@ func SendHeartBeat() error {
 	cpu := sysinfo.GetCPUPercent()
 	mem := sysinfo.GetMemPercent()
 	res, err := rpcClient.DoHeartBeat(ctx, &RPCService.HeartbeatRequest{
-		Mac: sysinfo.GetMacAddr(),
+		IP:  sysinfo.GetMacAddr(),
 		CPU: &cpu,
 		Mem: &mem,
 	})
