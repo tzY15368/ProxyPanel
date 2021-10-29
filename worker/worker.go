@@ -16,7 +16,12 @@ import (
 var internalG *gin.Engine
 
 func StartWorker() {
-	err := rpc.Startup()
+	err := rpc.InitRPCClient()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	err = rpc.Startup()
 	if err != nil {
 		// service should be unreachable if not registered
 		logrus.Fatal(err)

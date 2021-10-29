@@ -143,12 +143,12 @@ func GenSubscriptionData(uid string) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(result)), nil
 }
 
-func init() {
+func StartTimeoutCheck() {
 	go func() {
 		for {
 			for sessionid, server := range Servers {
 				if time.Now().Sub(server.lastHeartBeat) > time.Second*time.Duration(config.Cfg.HeartBeatRateIntervalSec*config.Cfg.HeartBeatErrorThres) {
-					logrus.Warnf("timeout on server %s", server.Host)
+					logrus.Warnf("timeout on worker %s", server.Host)
 					delete(Servers, sessionid)
 				}
 			}

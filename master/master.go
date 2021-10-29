@@ -14,6 +14,7 @@ import (
 	"github.com/tzY15368/lazarus/gen-go/RPCService"
 	"github.com/tzY15368/lazarus/master/handlers"
 	"github.com/tzY15368/lazarus/master/handlers/rpc"
+	"github.com/tzY15368/lazarus/master/handlers/servers"
 	"github.com/tzY15368/lazarus/master/models"
 )
 
@@ -64,4 +65,7 @@ func StartMaster() {
 	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
 	go server.Serve()
 	logrus.Info("started master RPC server at", rpcAddr)
+
+	go servers.StartTimeoutCheck()
+	logrus.Info("started workers timeout check")
 }

@@ -1,11 +1,6 @@
 package auth
 
-var authFilterMap map[string]struct{}
-
-func init() {
-
-	authFilterMap = make(map[string]struct{})
-}
+var authFilterMap = make(map[string]struct{})
 
 func SetMap(a map[string]struct{}) {
 	authFilterMap = a

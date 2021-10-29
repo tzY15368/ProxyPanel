@@ -20,14 +20,14 @@ var sessionID string
 
 const Port = 443
 
-func init() {
+func InitRPCClient() error {
 	transport, err := thrift.NewTSocket(config.Cfg.Worker.MasterAddr)
 	if err != nil {
-		logrus.Fatal("initialize transport error", err)
+		return err
 	}
 	protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
 	if err := transport.Open(); err != nil {
-		logrus.Fatal("initialize protocol error", err)
+		return err
 	}
 	iprot := protocolFactory.GetProtocol(transport)
 	oprot := protocolFactory.GetProtocol(transport)
