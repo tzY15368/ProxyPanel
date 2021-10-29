@@ -46,10 +46,14 @@
 
 #### worker 时间轴
 
-- worker启动时向配置文件中提供的master RPC地址进行服务注册，若注册失败则退出
-- worker启动后向master定期发带自身负载数据的心跳包
+- master收到建机器请求后去cf加dns，同时通过ssh登录worker机器下载docker并启动worker镜像，数据盘挂到宿主机/opt上
+- 初始化：worker启动后如果发现已经完成配置则goto注册；首先向master请求装需要的配置信息：add/host（initializeRequest）
+- master回复initializeResponse，下发配置
+- worker安装nginx,v2ray,应用配置，向lets encrypt申请证书.任何一步失败则退出，由master检测超时，成功则在cwd下写一个文件表明环境配置正确，以便重启时goto注册
+- 注册：worker配置完成后向master进行服务注册，若注册失败则退出
+- 心跳：worker启动后向master定期发带自身负载数据的心跳包
 - master发生故障（worker多次心跳超时）后worker直接退出进程
-- 进程退出后由进程管理器（一阶段systemd，二阶段docker/其他）重启
+- 进程退出后由进程管理器（一阶段systemd，二阶段docker/自行实现daemon？）重启
 
 ### Panel Master
 
