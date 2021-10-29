@@ -32,6 +32,7 @@ func InitRPCClient() error {
 	iprot := protocolFactory.GetProtocol(transport)
 	oprot := protocolFactory.GetProtocol(transport)
 	rpcClient = RPCService.NewLazarusServiceClient(thrift.NewTStandardClient(iprot, oprot))
+	return nil
 }
 func Startup() (e error) {
 	e = mustInitializeServer()
