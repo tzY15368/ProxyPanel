@@ -8,13 +8,13 @@
 
 - 通过nginx反向代理中增加lua脚本，基于本地worker检查用户订阅状态来支持多用户
 - 自动生成V2rayN、shadowrocket兼容的订阅
-- 用户面板中显示全部metadata：服务端在线数、总用量、并发数……
+- 用户面板中显示全部metadata：服务端在线数、总用量、443并发数……
 
 ### 二阶段
 
 - 配置其他机器key后自动部署v2ray,nginx和worker实例
 - terraform自动买机器扩容
-- 所有worker的域名为四级域名([WORKERID].xxx.xxx.xxx)，从master在的三级域名由master做动态解析，worker只需master的RPC地址即可工作，避免复杂配置  
+- 所有worker的域名为四级域名([WORKERID].xxx.xxx.xxx)，由master调cloudflare api实现动态解析，worker只需master的RPC地址即可工作，避免复杂配置  
 - dockerize，使扩容更容易
 
 ## 架构与实现细节
@@ -46,18 +46,18 @@
 
 #### worker 时间轴
 
-- master收到建机器请求后去cf加dns，同时通过ssh登录worker机器下载docker并启动worker镜像，数据盘挂到宿主机/opt上
+- master收到建机器请求后去cf加dns，同时通过ssh登录worker机器安装docker-compose并启动worker,nginx和v2ray镜像，数据盘挂到宿主机/opt上
 - 初始化：worker启动后如果发现已经完成配置则goto注册；首先向master请求装需要的配置信息：add/host（initializeRequest）
 - master回复initializeResponse，下发配置
-- worker安装nginx,v2ray,应用配置，向lets encrypt申请证书.任何一步失败则退出，由master检测超时，成功则在cwd下写一个文件表明环境配置正确，以便重启时goto注册
+- worker应用配置，向lets encrypt申请证书.任何一步失败则退出，由master检测超时，成功则在cwd下写一个文件表明环境配置正确，以便重启时goto注册
 - 注册：worker配置完成后向master进行服务注册，若注册失败则退出
 - 心跳：worker启动后向master定期发带自身负载数据的心跳包
-- master发生故障（worker多次心跳超时）后worker直接退出进程
-- 进程退出后由进程管理器（一阶段systemd，二阶段docker/自行实现daemon？）重启
+- master发生故障（worker发现多次心跳rpc超时）后worker直接退出进程
+- worker进程退出后由进程管理器（一阶段systemd，二阶段docker）重启
 
 ### Panel Master
 
-- 接受proxy worker上报数据，持久化，可生成监控图，同时响应中增量更新配置信息（至少实现配置是否有更新，如果有则附上配置）
+- 接受proxy worker上报数据，刷盘？，可生成监控图，同时响应中增量更新配置信息（至少实现配置是否有更新，如果有则附上配置）
 
 - 设计订阅过期：expireAt字段，服务端每次下发时进行计算（数据量大了之后可能会有性能问题）
 - sqlite持久化用户数据(低写较低读)。
