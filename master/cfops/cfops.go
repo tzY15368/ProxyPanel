@@ -1,49 +1,42 @@
-package main
+package cfops
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"strings"
 
 	"github.com/cloudflare/cloudflare-go"
+	"github.com/sirupsen/logrus"
+	"github.com/tzY15368/lazarus/config"
 )
 
-const key = ""
-const email = ""
+const TTL = 61
 
-func main() {
-	// Construct a new API object
-	api, err := cloudflare.NewWithAPIToken(key)
+var api *cloudflare.API
+var err error
+var ctx = context.Background()
+var zoneID string
+
+func InitCFApi() error {
+
+	api, err = cloudflare.NewWithAPIToken(config.Cfg.Master.CloudFlareAPIKey)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// Most API calls require a Context
-	ctx := context.Background()
+	zoneID, err = api.ZoneIDByName(config.Cfg.Master.CloudFlareZoneName)
+	return err
+}
 
-	// Fetch the zone ID
-	id, err := api.ZoneIDByName("fmagic.icu") // Assuming example.com exists in your Cloudflare account already
-	if err != nil {
-		log.Fatal(err)
+func RegisterIP(ip string) (domain string, err error) {
+	dType := "A"
+	// v6
+	if strings.Contains(ip, ":") {
+		dType = "AAAA"
 	}
-
-	// Fetch zone details
-	// zone, err := api.ZoneDetails(ctx, id)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// // Print zone details
-	// fmt.Println(zone)
-	r, err := api.DNSRecords(ctx, id, cloudflare.DNSRecord{})
+	res, err := api.CreateDNSRecord(ctx, zoneID, cloudflare.DNSRecord{Type: dType, Name: "test.fmagic.icu", Content: ip, TTL: TTL})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
-	fmt.Printf("%+v", r)
-
-	res, err := api.CreateDNSRecord(ctx, id, cloudflare.DNSRecord{Type: "A", Name: "test.fmagic.icu", Content: "118.190.58.76", TTL: 61})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%+v", res)
+	logrus.Infof("res: %v\n", res)
+	return
 }

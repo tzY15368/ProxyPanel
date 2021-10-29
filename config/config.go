@@ -44,11 +44,15 @@ type WorkerCFG struct {
 }
 
 type MasterCFG struct {
-	Enabled bool
-	Db      string
-	Host    string
-	Secret  string
-	Port    int
-	RpcHost string
-	RpcPort int
+	Enabled            bool
+	Db                 string
+	Host               string
+	Secret             string
+	Port               int
+	RpcHost            string
+	RpcPort            int
+	CloudFlareAPIKey   string
+	CloudFlareZoneName string
+	TelegramAPIKey     string
+	TelegramGroupID    int64
 }

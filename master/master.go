@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
 	"github.com/tzY15368/lazarus/gen-go/RPCService"
+	"github.com/tzY15368/lazarus/master/bot"
+	"github.com/tzY15368/lazarus/master/cfops"
 	"github.com/tzY15368/lazarus/master/handlers"
 	"github.com/tzY15368/lazarus/master/handlers/rpc"
 	"github.com/tzY15368/lazarus/master/handlers/servers"
@@ -31,6 +33,16 @@ func StartMaster() {
 	err := models.SetupDB(cfg.Db)
 	if err != nil {
 		log.Fatal("db conn error", err)
+	}
+
+	err = cfops.InitCFApi()
+	if err != nil {
+		log.Fatal("cf api initialize error", err)
+	}
+
+	err = bot.InitBot()
+	if err != nil {
+		log.Fatal("bot initialize error", err)
 	}
 
 	// init web server

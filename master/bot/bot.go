@@ -1,24 +1,27 @@
-package main
+package bot
 
 import (
-	"fmt"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/tzY15368/lazarus/config"
 )
 
-const token = "*"
-const groupID = int64(0)
+var bot *tgbotapi.BotAPI
+var err error
 
-func main() {
-	bot, err := tgbotapi.NewBotAPI(token)
+func InitBot() error {
+	bot, err = tgbotapi.NewBotAPI(config.Cfg.Master.TelegramAPIKey)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
 	bot.Debug = true
-	//u, e := bot.GetUpdates(tgbotapi.UpdateConfig{})
-	msg := tgbotapi.NewMessage(groupID, "helo")
-	u, e := bot.Send(msg)
-	fmt.Println(u)
-	fmt.Println(e)
+	return nil
+}
+
+func SendMessageToGroup(message string) error {
+	msg := tgbotapi.NewMessage(config.Cfg.Master.TelegramGroupID, message)
+	_, e := bot.Send(msg)
+	if e != nil {
+		return e
+	}
+	return nil
 }
