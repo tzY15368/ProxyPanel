@@ -2,7 +2,10 @@ package config
 
 import (
 	"encoding/json"
+	"io"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 var Cfg *Config
@@ -22,6 +25,25 @@ func InitConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
+	logf, err := os.OpenFile(Cfg.LogPath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		return nil, err
+	}
+	mw := io.MultiWriter(os.Stdout, logf)
+	logrus.SetOutput(mw)
+	level := logrus.DebugLevel
+	switch Cfg.LogLevel {
+	case logrus.DebugLevel.String():
+		level = logrus.DebugLevel
+	case logrus.InfoLevel.String():
+		level = logrus.InfoLevel
+	case logrus.WarnLevel.String():
+		level = logrus.WarnLevel
+	case logrus.ErrorLevel.String():
+		level = logrus.ErrorLevel
+	}
+	logrus.SetLevel(level)
+	logrus.Info("config is read ", "logrus level is ", Cfg.LogLevel)
 	return Cfg, nil
 }
 
