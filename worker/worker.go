@@ -49,7 +49,7 @@ func StartWorker() {
 				errorCounter++
 				logrus.Error(err)
 			}
-			if errorCounter > config.Cfg.HeartBeatErrorThres {
+			if errorCounter >= config.Cfg.HeartBeatErrorThres {
 				logrus.Fatalf("heartbeat rpc failed failed more than %d times", config.Cfg.HeartBeatErrorThres)
 			}
 		}
