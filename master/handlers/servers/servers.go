@@ -4,68 +4,29 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"sort"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
+	"github.com/tzY15368/lazarus/master/models"
 )
-
-var Servers = make(map[string]*ServerData)
 
 var ErrServerNotFound = errors.New("err server not found")
 var ErrServerExists = errors.New("err server exists")
 
 const PORT = 443
 
-type ServerData struct {
-	*ServerConfig
-	*ServerMetric
-}
-type ServerConfig struct {
-	Tls  string `json:"tls"`
-	Ps   string `json:"ps"`
-	Add  string `json:"add"`
-	Id   string `json:"id"`
-	Host string `json:"host"`
-	V    string `json:"v"`
-	Aid  int    `json:"aid"`
-	Net  string `json:"net"`
-	Path string `json:"path"`
-	Type string `json:"type"`
-	Port int    `json:"port"`
-
-	created       bool
-	registered    bool
-	ipv6          bool
-	lastHeartBeat time.Time `json:"-"`
-}
-
-type ServerMetric struct {
-	cpu       int `json:"-"`
-	mem       int `json:"-"`
-	tcp       int `json:"-"`
-	dataQuota int `json:"-"`
-	dataTotal int `json:"-"`
-}
-
 type CreateServerParams struct {
-	Ip   string `josn:"ip"`
-	Add  string `json:"add"`
-	Host string `json:"host"`
-	Ps   string `json:"ps"`
+	Ip      string `josn:"ip"`
+	Add     string `json:"add"`
+	Host    string `json:"host"`
+	Ps      string `json:"ps"`
+	HasIpv6 bool   `json:"hasIpv6"`
 }
 
 func CreateServer(params *CreateServerParams) error {
-	if _, ok := Servers[params.Ip]; ok {
-		return ErrServerExists
-	}
-	Servers[params.Ip] = newServer(params)
-	return nil
-}
-
-func newServer(params *CreateServerParams) *ServerData {
-	sc := ServerConfig{
+	sv := &models.Servers{
+		Ip:   params.Ip,
 		Tls:  "tls",
 		Add:  params.Add,
 		Host: params.Host,
@@ -79,59 +40,60 @@ func newServer(params *CreateServerParams) *ServerData {
 		Type: "none",
 		Port: PORT,
 
-		lastHeartBeat: time.Now(),
-		registered:    false,
-		ipv6:          false,
+		HasIpv6: params.HasIpv6,
 	}
-	sd := &ServerData{
-		ServerConfig: &sc,
-		ServerMetric: &ServerMetric{},
+	err := models.DB.Create(sv).Error
+	if err != nil {
+		return err
 	}
-	return sd
+
+	logrus.WithField("params", *params).Info("server is created")
+	return nil
 }
 
-func GetInitializeParams(ip string) (*CreateServerParams, error) {
-	if server, ok := Servers[ip]; ok {
-		csp := CreateServerParams{}
-		csp.Add = server.Add
-		csp.Host = server.Host
-		csp.Ps = server.Ps
-		return &csp, nil
+// RegisterServer tells master that the worker is up, and provides it with config
+//
+// The service wont be available until the first heartbeat is received
+func RegisterServer(ip string) (*CreateServerParams, error) {
+	sv := &models.Servers{Ip: ip}
+	tx := models.DB.Model(sv).Updates(models.Servers{Registered: true, LastHeartBeat: time.Unix(0, 0)})
+	logrus.WithField("rows affected", tx.RowsAffected).WithField("ip", ip).Info("registered server")
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
-	return nil, ErrServerNotFound
-}
-
-func RegisterServer(ip string) error {
-	if server, ok := Servers[ip]; ok {
-		server.registered = true
-		logrus.Infof("server %s was registered", server.Host)
-		return nil
+	csp := &CreateServerParams{
+		Add:  sv.Add,
+		Host: sv.Host,
+		Ps:   sv.Ps,
 	}
-	return ErrServerNotFound
+	return csp, nil
 }
 
 func RegisterHeartbeat(ip string) error {
-	if server, ok := Servers[ip]; ok {
-		server.lastHeartBeat = time.Now()
-		return nil
+	sv := &models.Servers{Ip: ip}
+	tx := models.DB.Model(sv).Updates(models.Servers{Ready: true, LastHeartBeat: time.Now()})
+	logrus.WithField("rows affected", tx.RowsAffected).WithField("ip", ip).Info("registered heartbeat")
+	return tx.Error
+}
+
+func GetValidServers() []*models.Servers {
+	var servers = make([]*models.Servers, 0)
+	tx := models.DB.Where("ready = ?", true).Find(&servers)
+	if tx.Error != nil {
+		logrus.Error(tx.Error)
+	} else {
+		logrus.WithField("serverCount", len(servers)).Info("got ready server")
 	}
-	logrus.Warn("non-existent ip", ip)
-	return ErrServerNotFound
+	return servers
 }
 
 // 生成v2ray订阅格式的base64编码字符串
-func GenSubscriptionData(uid string) (string, error) {
-	serverKeys := make([]string, 0, len(Servers))
-	for k := range Servers {
-		serverKeys = append(serverKeys, k)
-	}
-	sort.Strings(serverKeys)
+func GenSubscriptionString(uid string) (string, error) {
 	result := ""
-	for _, serverKey := range serverKeys {
+	servers := GetValidServers()
+	for _, sv := range servers {
 		result += "vmess://"
-		sv := Servers[serverKey]
-		sv.Path += "?token=" + uid
-		logrus.Info(sv.Path, Servers[serverKey].Path)
+		sv.Path += ("?token=" + uid)
 		b, err := json.Marshal(sv)
 		if err != nil {
 			return "", err
@@ -139,18 +101,20 @@ func GenSubscriptionData(uid string) (string, error) {
 		result += base64.StdEncoding.EncodeToString(b)
 		result += "\n"
 	}
-	logrus.Infof("generating subscription for %d servers", len(Servers))
 	return base64.StdEncoding.EncodeToString([]byte(result)), nil
 }
 
 func StartTimeoutCheck() {
 	go func() {
 		for {
-			for sessionid, server := range Servers {
-				if time.Now().Sub(server.lastHeartBeat) > time.Second*time.Duration(config.Cfg.HeartBeatRateIntervalSec*config.Cfg.HeartBeatErrorThres) {
-					logrus.Warnf("timeout on worker %s", server.Host)
-					delete(Servers, sessionid)
-				}
+			sv := &models.Servers{}
+			expireTime := time.Now().Add(time.Second * time.Duration(config.Cfg.HeartBeatErrorThres) * time.Duration(config.Cfg.HeartBeatRateIntervalSec))
+			tx := models.DB.Model(sv).Where("lastHeartBeat < ?", expireTime).Update("ready", false)
+			if tx.Error != nil {
+				logrus.WithError(tx.Error).Info("error while timeout check")
+			}
+			if tx.RowsAffected != 0 {
+				logrus.WithField("rows affected", tx.RowsAffected).Info("timeout check detected change")
 			}
 			time.Sleep(2 * time.Second)
 		}

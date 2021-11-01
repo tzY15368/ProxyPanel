@@ -74,7 +74,7 @@ func UpdateSubscription(c *gin.Context) {
 
 func HandleSubscription(c *gin.Context) {
 	token := c.Param("token")
-	data, err := servers.GenSubscriptionData(token)
+	data, err := servers.GenSubscriptionString(token)
 	if err != nil {
 		c.Status(http.StatusForbidden)
 		return
@@ -84,7 +84,7 @@ func HandleSubscription(c *gin.Context) {
 }
 
 func HandleSubscriptionJSON(c *gin.Context) {
-	c.AbortWithStatusJSON(http.StatusOK, servers.Servers)
+	c.AbortWithStatusJSON(http.StatusOK, servers.GetValidServers())
 }
 
 func HandleTokenRefresh(c *gin.Context) {
