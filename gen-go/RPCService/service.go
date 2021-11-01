@@ -23,260 +23,6 @@ func UserDataPtr(v UserData) *UserData { return &v }
 
 // Attributes:
 //  - IP
-type InitializeRequest struct {
-  IP string `thrift:"ip,1,required" db:"ip" json:"ip"`
-}
-
-func NewInitializeRequest() *InitializeRequest {
-  return &InitializeRequest{}
-}
-
-
-func (p *InitializeRequest) GetIP() string {
-  return p.IP
-}
-func (p *InitializeRequest) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-  var issetIP bool = false;
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 1:
-      if fieldTypeId == thrift.STRING {
-        if err := p.ReadField1(ctx, iprot); err != nil {
-          return err
-        }
-        issetIP = true
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  if !issetIP{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field IP is not set"));
-  }
-  return nil
-}
-
-func (p *InitializeRequest)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(ctx); err != nil {
-  return thrift.PrependError("error reading field 1: ", err)
-} else {
-  p.IP = v
-}
-  return nil
-}
-
-func (p *InitializeRequest) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "InitializeRequest"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField1(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *InitializeRequest) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "ip", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ip: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.IP)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.ip (1) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ip: ", p), err) }
-  return err
-}
-
-func (p *InitializeRequest) Equals(other *InitializeRequest) bool {
-  if p == other {
-    return true
-  } else if p == nil || other == nil {
-    return false
-  }
-  if p.IP != other.IP { return false }
-  return true
-}
-
-func (p *InitializeRequest) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("InitializeRequest(%+v)", *p)
-}
-
-// Attributes:
-//  - Add
-//  - Host
-type InitializeResponse struct {
-  Add string `thrift:"add,1,required" db:"add" json:"add"`
-  Host string `thrift:"host,2,required" db:"host" json:"host"`
-}
-
-func NewInitializeResponse() *InitializeResponse {
-  return &InitializeResponse{}
-}
-
-
-func (p *InitializeResponse) GetAdd() string {
-  return p.Add
-}
-
-func (p *InitializeResponse) GetHost() string {
-  return p.Host
-}
-func (p *InitializeResponse) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-  var issetAdd bool = false;
-  var issetHost bool = false;
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 1:
-      if fieldTypeId == thrift.STRING {
-        if err := p.ReadField1(ctx, iprot); err != nil {
-          return err
-        }
-        issetAdd = true
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    case 2:
-      if fieldTypeId == thrift.STRING {
-        if err := p.ReadField2(ctx, iprot); err != nil {
-          return err
-        }
-        issetHost = true
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  if !issetAdd{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Add is not set"));
-  }
-  if !issetHost{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Host is not set"));
-  }
-  return nil
-}
-
-func (p *InitializeResponse)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(ctx); err != nil {
-  return thrift.PrependError("error reading field 1: ", err)
-} else {
-  p.Add = v
-}
-  return nil
-}
-
-func (p *InitializeResponse)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(ctx); err != nil {
-  return thrift.PrependError("error reading field 2: ", err)
-} else {
-  p.Host = v
-}
-  return nil
-}
-
-func (p *InitializeResponse) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "InitializeResponse"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField1(ctx, oprot); err != nil { return err }
-    if err := p.writeField2(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *InitializeResponse) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "add", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:add: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.Add)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.add (1) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:add: ", p), err) }
-  return err
-}
-
-func (p *InitializeResponse) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "host", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:host: ", p), err) }
-  if err := oprot.WriteString(ctx, string(p.Host)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.host (2) field write error: ", p), err) }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:host: ", p), err) }
-  return err
-}
-
-func (p *InitializeResponse) Equals(other *InitializeResponse) bool {
-  if p == other {
-    return true
-  } else if p == nil || other == nil {
-    return false
-  }
-  if p.Add != other.Add { return false }
-  if p.Host != other.Host { return false }
-  return true
-}
-
-func (p *InitializeResponse) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("InitializeResponse(%+v)", *p)
-}
-
-// Attributes:
-//  - IP
 type RegisterRequest struct {
   IP string `thrift:"ip,1,required" db:"ip" json:"ip"`
 }
@@ -382,17 +128,29 @@ func (p *RegisterRequest) String() string {
 }
 
 // Attributes:
+//  - Add
+//  - Host
 //  - HeartBeatRateIntervalSec
 //  - HeartBeatErrorThres
 type RegisterResponse struct {
-  HeartBeatRateIntervalSec int32 `thrift:"heartBeatRateIntervalSec,1,required" db:"heartBeatRateIntervalSec" json:"heartBeatRateIntervalSec"`
-  HeartBeatErrorThres int32 `thrift:"HeartBeatErrorThres,2,required" db:"HeartBeatErrorThres" json:"HeartBeatErrorThres"`
+  Add string `thrift:"add,1,required" db:"add" json:"add"`
+  Host string `thrift:"host,2,required" db:"host" json:"host"`
+  HeartBeatRateIntervalSec int32 `thrift:"heartBeatRateIntervalSec,3,required" db:"heartBeatRateIntervalSec" json:"heartBeatRateIntervalSec"`
+  HeartBeatErrorThres int32 `thrift:"HeartBeatErrorThres,4,required" db:"HeartBeatErrorThres" json:"HeartBeatErrorThres"`
 }
 
 func NewRegisterResponse() *RegisterResponse {
   return &RegisterResponse{}
 }
 
+
+func (p *RegisterResponse) GetAdd() string {
+  return p.Add
+}
+
+func (p *RegisterResponse) GetHost() string {
+  return p.Host
+}
 
 func (p *RegisterResponse) GetHeartBeatRateIntervalSec() int32 {
   return p.HeartBeatRateIntervalSec
@@ -406,6 +164,8 @@ func (p *RegisterResponse) Read(ctx context.Context, iprot thrift.TProtocol) err
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
+  var issetAdd bool = false;
+  var issetHost bool = false;
   var issetHeartBeatRateIntervalSec bool = false;
   var issetHeartBeatErrorThres bool = false;
 
@@ -417,8 +177,30 @@ func (p *RegisterResponse) Read(ctx context.Context, iprot thrift.TProtocol) err
     if fieldTypeId == thrift.STOP { break; }
     switch fieldId {
     case 1:
-      if fieldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(ctx, iprot); err != nil {
+          return err
+        }
+        issetAdd = true
+      } else {
+        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField2(ctx, iprot); err != nil {
+          return err
+        }
+        issetHost = true
+      } else {
+        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 3:
+      if fieldTypeId == thrift.I32 {
+        if err := p.ReadField3(ctx, iprot); err != nil {
           return err
         }
         issetHeartBeatRateIntervalSec = true
@@ -427,9 +209,9 @@ func (p *RegisterResponse) Read(ctx context.Context, iprot thrift.TProtocol) err
           return err
         }
       }
-    case 2:
+    case 4:
       if fieldTypeId == thrift.I32 {
-        if err := p.ReadField2(ctx, iprot); err != nil {
+        if err := p.ReadField4(ctx, iprot); err != nil {
           return err
         }
         issetHeartBeatErrorThres = true
@@ -450,6 +232,12 @@ func (p *RegisterResponse) Read(ctx context.Context, iprot thrift.TProtocol) err
   if err := iprot.ReadStructEnd(ctx); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
+  if !issetAdd{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Add is not set"));
+  }
+  if !issetHost{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Host is not set"));
+  }
   if !issetHeartBeatRateIntervalSec{
     return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field HeartBeatRateIntervalSec is not set"));
   }
@@ -460,17 +248,35 @@ func (p *RegisterResponse) Read(ctx context.Context, iprot thrift.TProtocol) err
 }
 
 func (p *RegisterResponse)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadI32(ctx); err != nil {
+  if v, err := iprot.ReadString(ctx); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Add = v
+}
+  return nil
+}
+
+func (p *RegisterResponse)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(ctx); err != nil {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Host = v
+}
+  return nil
+}
+
+func (p *RegisterResponse)  ReadField3(ctx context.Context, iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI32(ctx); err != nil {
+  return thrift.PrependError("error reading field 3: ", err)
 } else {
   p.HeartBeatRateIntervalSec = v
 }
   return nil
 }
 
-func (p *RegisterResponse)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+func (p *RegisterResponse)  ReadField4(ctx context.Context, iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(ctx); err != nil {
-  return thrift.PrependError("error reading field 2: ", err)
+  return thrift.PrependError("error reading field 4: ", err)
 } else {
   p.HeartBeatErrorThres = v
 }
@@ -483,6 +289,8 @@ func (p *RegisterResponse) Write(ctx context.Context, oprot thrift.TProtocol) er
   if p != nil {
     if err := p.writeField1(ctx, oprot); err != nil { return err }
     if err := p.writeField2(ctx, oprot); err != nil { return err }
+    if err := p.writeField3(ctx, oprot); err != nil { return err }
+    if err := p.writeField4(ctx, oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(ctx); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -492,22 +300,42 @@ func (p *RegisterResponse) Write(ctx context.Context, oprot thrift.TProtocol) er
 }
 
 func (p *RegisterResponse) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "heartBeatRateIntervalSec", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:heartBeatRateIntervalSec: ", p), err) }
-  if err := oprot.WriteI32(ctx, int32(p.HeartBeatRateIntervalSec)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.heartBeatRateIntervalSec (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "add", thrift.STRING, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:add: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.Add)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.add (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:heartBeatRateIntervalSec: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:add: ", p), err) }
   return err
 }
 
 func (p *RegisterResponse) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "HeartBeatErrorThres", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:HeartBeatErrorThres: ", p), err) }
-  if err := oprot.WriteI32(ctx, int32(p.HeartBeatErrorThres)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.HeartBeatErrorThres (2) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin(ctx, "host", thrift.STRING, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:host: ", p), err) }
+  if err := oprot.WriteString(ctx, string(p.Host)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.host (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:HeartBeatErrorThres: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:host: ", p), err) }
+  return err
+}
+
+func (p *RegisterResponse) writeField3(ctx context.Context, oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin(ctx, "heartBeatRateIntervalSec", thrift.I32, 3); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:heartBeatRateIntervalSec: ", p), err) }
+  if err := oprot.WriteI32(ctx, int32(p.HeartBeatRateIntervalSec)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.heartBeatRateIntervalSec (3) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(ctx); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:heartBeatRateIntervalSec: ", p), err) }
+  return err
+}
+
+func (p *RegisterResponse) writeField4(ctx context.Context, oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin(ctx, "HeartBeatErrorThres", thrift.I32, 4); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:HeartBeatErrorThres: ", p), err) }
+  if err := oprot.WriteI32(ctx, int32(p.HeartBeatErrorThres)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.HeartBeatErrorThres (4) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(ctx); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 4:HeartBeatErrorThres: ", p), err) }
   return err
 }
 
@@ -517,6 +345,8 @@ func (p *RegisterResponse) Equals(other *RegisterResponse) bool {
   } else if p == nil || other == nil {
     return false
   }
+  if p.Add != other.Add { return false }
+  if p.Host != other.Host { return false }
   if p.HeartBeatRateIntervalSec != other.HeartBeatRateIntervalSec { return false }
   if p.HeartBeatErrorThres != other.HeartBeatErrorThres { return false }
   return true
@@ -1078,9 +908,6 @@ func (p *HeartbeatResponse) String() string {
 
 type LazarusService interface {
   // Parameters:
-  //  - Ir
-  DoInitialize(ctx context.Context, ir *InitializeRequest) (_r *InitializeResponse, _err error)
-  // Parameters:
   //  - Rr
   DoRegister(ctx context.Context, rr *RegisterRequest) (_r *RegisterResponse, _err error)
   // Parameters:
@@ -1124,13 +951,13 @@ func (p *LazarusServiceClient) SetLastResponseMeta_(meta thrift.ResponseMeta) {
 }
 
 // Parameters:
-//  - Ir
-func (p *LazarusServiceClient) DoInitialize(ctx context.Context, ir *InitializeRequest) (_r *InitializeResponse, _err error) {
-  var _args2 LazarusServiceDoInitializeArgs
-  _args2.Ir = ir
-  var _result4 LazarusServiceDoInitializeResult
+//  - Rr
+func (p *LazarusServiceClient) DoRegister(ctx context.Context, rr *RegisterRequest) (_r *RegisterResponse, _err error) {
+  var _args2 LazarusServiceDoRegisterArgs
+  _args2.Rr = rr
+  var _result4 LazarusServiceDoRegisterResult
   var _meta3 thrift.ResponseMeta
-  _meta3, _err = p.Client_().Call(ctx, "DoInitialize", &_args2, &_result4)
+  _meta3, _err = p.Client_().Call(ctx, "DoRegister", &_args2, &_result4)
   p.SetLastResponseMeta_(_meta3)
   if _err != nil {
     return
@@ -1138,41 +965,23 @@ func (p *LazarusServiceClient) DoInitialize(ctx context.Context, ir *InitializeR
   if _ret5 := _result4.GetSuccess(); _ret5 != nil {
     return _ret5, nil
   }
-  return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "DoInitialize failed: unknown result")
-}
-
-// Parameters:
-//  - Rr
-func (p *LazarusServiceClient) DoRegister(ctx context.Context, rr *RegisterRequest) (_r *RegisterResponse, _err error) {
-  var _args6 LazarusServiceDoRegisterArgs
-  _args6.Rr = rr
-  var _result8 LazarusServiceDoRegisterResult
-  var _meta7 thrift.ResponseMeta
-  _meta7, _err = p.Client_().Call(ctx, "DoRegister", &_args6, &_result8)
-  p.SetLastResponseMeta_(_meta7)
-  if _err != nil {
-    return
-  }
-  if _ret9 := _result8.GetSuccess(); _ret9 != nil {
-    return _ret9, nil
-  }
   return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "DoRegister failed: unknown result")
 }
 
 // Parameters:
 //  - Hbr
 func (p *LazarusServiceClient) DoHeartBeat(ctx context.Context, hbr *HeartbeatRequest) (_r *HeartbeatResponse, _err error) {
-  var _args10 LazarusServiceDoHeartBeatArgs
-  _args10.Hbr = hbr
-  var _result12 LazarusServiceDoHeartBeatResult
-  var _meta11 thrift.ResponseMeta
-  _meta11, _err = p.Client_().Call(ctx, "DoHeartBeat", &_args10, &_result12)
-  p.SetLastResponseMeta_(_meta11)
+  var _args6 LazarusServiceDoHeartBeatArgs
+  _args6.Hbr = hbr
+  var _result8 LazarusServiceDoHeartBeatResult
+  var _meta7 thrift.ResponseMeta
+  _meta7, _err = p.Client_().Call(ctx, "DoHeartBeat", &_args6, &_result8)
+  p.SetLastResponseMeta_(_meta7)
   if _err != nil {
     return
   }
-  if _ret13 := _result12.GetSuccess(); _ret13 != nil {
-    return _ret13, nil
+  if _ret9 := _result8.GetSuccess(); _ret9 != nil {
+    return _ret9, nil
   }
   return nil, thrift.NewTApplicationException(thrift.MISSING_RESULT, "DoHeartBeat failed: unknown result")
 }
@@ -1197,11 +1006,10 @@ func (p *LazarusServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFun
 
 func NewLazarusServiceProcessor(handler LazarusService) *LazarusServiceProcessor {
 
-  self14 := &LazarusServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
-  self14.processorMap["DoInitialize"] = &lazarusServiceProcessorDoInitialize{handler:handler}
-  self14.processorMap["DoRegister"] = &lazarusServiceProcessorDoRegister{handler:handler}
-  self14.processorMap["DoHeartBeat"] = &lazarusServiceProcessorDoHeartBeat{handler:handler}
-return self14
+  self10 := &LazarusServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
+  self10.processorMap["DoRegister"] = &lazarusServiceProcessorDoRegister{handler:handler}
+  self10.processorMap["DoHeartBeat"] = &lazarusServiceProcessorDoHeartBeat{handler:handler}
+return self10
 }
 
 func (p *LazarusServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1212,92 +1020,13 @@ func (p *LazarusServiceProcessor) Process(ctx context.Context, iprot, oprot thri
   }
   iprot.Skip(ctx, thrift.STRUCT)
   iprot.ReadMessageEnd(ctx)
-  x15 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
+  x11 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
   oprot.WriteMessageBegin(ctx, name, thrift.EXCEPTION, seqId)
-  x15.Write(ctx, oprot)
+  x11.Write(ctx, oprot)
   oprot.WriteMessageEnd(ctx)
   oprot.Flush(ctx)
-  return false, x15
+  return false, x11
 
-}
-
-type lazarusServiceProcessorDoInitialize struct {
-  handler LazarusService
-}
-
-func (p *lazarusServiceProcessorDoInitialize) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-  args := LazarusServiceDoInitializeArgs{}
-  var err2 error
-  if err2 = args.Read(ctx, iprot); err2 != nil {
-    iprot.ReadMessageEnd(ctx)
-    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err2.Error())
-    oprot.WriteMessageBegin(ctx, "DoInitialize", thrift.EXCEPTION, seqId)
-    x.Write(ctx, oprot)
-    oprot.WriteMessageEnd(ctx)
-    oprot.Flush(ctx)
-    return false, thrift.WrapTException(err2)
-  }
-  iprot.ReadMessageEnd(ctx)
-
-  tickerCancel := func() {}
-  // Start a goroutine to do server side connectivity check.
-  if thrift.ServerConnectivityCheckInterval > 0 {
-    var cancel context.CancelFunc
-    ctx, cancel = context.WithCancel(ctx)
-    defer cancel()
-    var tickerCtx context.Context
-    tickerCtx, tickerCancel = context.WithCancel(context.Background())
-    defer tickerCancel()
-    go func(ctx context.Context, cancel context.CancelFunc) {
-      ticker := time.NewTicker(thrift.ServerConnectivityCheckInterval)
-      defer ticker.Stop()
-      for {
-        select {
-        case <-ctx.Done():
-          return
-        case <-ticker.C:
-          if !iprot.Transport().IsOpen() {
-            cancel()
-            return
-          }
-        }
-      }
-    }(tickerCtx, cancel)
-  }
-
-  result := LazarusServiceDoInitializeResult{}
-  var retval *InitializeResponse
-  if retval, err2 = p.handler.DoInitialize(ctx, args.Ir); err2 != nil {
-    tickerCancel()
-    if err2 == thrift.ErrAbandonRequest {
-      return false, thrift.WrapTException(err2)
-    }
-    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing DoInitialize: " + err2.Error())
-    oprot.WriteMessageBegin(ctx, "DoInitialize", thrift.EXCEPTION, seqId)
-    x.Write(ctx, oprot)
-    oprot.WriteMessageEnd(ctx)
-    oprot.Flush(ctx)
-    return true, thrift.WrapTException(err2)
-  } else {
-    result.Success = retval
-  }
-  tickerCancel()
-  if err2 = oprot.WriteMessageBegin(ctx, "DoInitialize", thrift.REPLY, seqId); err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = result.Write(ctx, oprot); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = oprot.WriteMessageEnd(ctx); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
-    err = thrift.WrapTException(err2)
-  }
-  if err != nil {
-    return
-  }
-  return true, err
 }
 
 type lazarusServiceProcessorDoRegister struct {
@@ -1460,204 +1189,6 @@ func (p *lazarusServiceProcessorDoHeartBeat) Process(ctx context.Context, seqId 
 
 
 // HELPER FUNCTIONS AND STRUCTURES
-
-// Attributes:
-//  - Ir
-type LazarusServiceDoInitializeArgs struct {
-  Ir *InitializeRequest `thrift:"ir,1" db:"ir" json:"ir"`
-}
-
-func NewLazarusServiceDoInitializeArgs() *LazarusServiceDoInitializeArgs {
-  return &LazarusServiceDoInitializeArgs{}
-}
-
-var LazarusServiceDoInitializeArgs_Ir_DEFAULT *InitializeRequest
-func (p *LazarusServiceDoInitializeArgs) GetIr() *InitializeRequest {
-  if !p.IsSetIr() {
-    return LazarusServiceDoInitializeArgs_Ir_DEFAULT
-  }
-return p.Ir
-}
-func (p *LazarusServiceDoInitializeArgs) IsSetIr() bool {
-  return p.Ir != nil
-}
-
-func (p *LazarusServiceDoInitializeArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 1:
-      if fieldTypeId == thrift.STRUCT {
-        if err := p.ReadField1(ctx, iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeArgs)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
-  p.Ir = &InitializeRequest{}
-  if err := p.Ir.Read(ctx, iprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Ir), err)
-  }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "DoInitialize_args"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField1(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin(ctx, "ir", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ir: ", p), err) }
-  if err := p.Ir.Write(ctx, oprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Ir), err)
-  }
-  if err := oprot.WriteFieldEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ir: ", p), err) }
-  return err
-}
-
-func (p *LazarusServiceDoInitializeArgs) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("LazarusServiceDoInitializeArgs(%+v)", *p)
-}
-
-// Attributes:
-//  - Success
-type LazarusServiceDoInitializeResult struct {
-  Success *InitializeResponse `thrift:"success,0" db:"success" json:"success,omitempty"`
-}
-
-func NewLazarusServiceDoInitializeResult() *LazarusServiceDoInitializeResult {
-  return &LazarusServiceDoInitializeResult{}
-}
-
-var LazarusServiceDoInitializeResult_Success_DEFAULT *InitializeResponse
-func (p *LazarusServiceDoInitializeResult) GetSuccess() *InitializeResponse {
-  if !p.IsSetSuccess() {
-    return LazarusServiceDoInitializeResult_Success_DEFAULT
-  }
-return p.Success
-}
-func (p *LazarusServiceDoInitializeResult) IsSetSuccess() bool {
-  return p.Success != nil
-}
-
-func (p *LazarusServiceDoInitializeResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
-  if _, err := iprot.ReadStructBegin(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
-  }
-
-
-  for {
-    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
-    if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
-    }
-    if fieldTypeId == thrift.STOP { break; }
-    switch fieldId {
-    case 0:
-      if fieldTypeId == thrift.STRUCT {
-        if err := p.ReadField0(ctx, iprot); err != nil {
-          return err
-        }
-      } else {
-        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-          return err
-        }
-      }
-    default:
-      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-        return err
-      }
-    }
-    if err := iprot.ReadFieldEnd(ctx); err != nil {
-      return err
-    }
-  }
-  if err := iprot.ReadStructEnd(ctx); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-  }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeResult)  ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
-  p.Success = &InitializeResponse{}
-  if err := p.Success.Read(ctx, iprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
-  }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin(ctx, "DoInitialize_result"); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
-  if p != nil {
-    if err := p.writeField0(ctx, oprot); err != nil { return err }
-  }
-  if err := oprot.WriteFieldStop(ctx); err != nil {
-    return thrift.PrependError("write field stop error: ", err) }
-  if err := oprot.WriteStructEnd(ctx); err != nil {
-    return thrift.PrependError("write struct stop error: ", err) }
-  return nil
-}
-
-func (p *LazarusServiceDoInitializeResult) writeField0(ctx context.Context, oprot thrift.TProtocol) (err error) {
-  if p.IsSetSuccess() {
-    if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
-    if err := p.Success.Write(ctx, oprot); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
-    }
-    if err := oprot.WriteFieldEnd(ctx); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
-  }
-  return err
-}
-
-func (p *LazarusServiceDoInitializeResult) String() string {
-  if p == nil {
-    return "<nil>"
-  }
-  return fmt.Sprintf("LazarusServiceDoInitializeResult(%+v)", *p)
-}
 
 // Attributes:
 //  - Rr

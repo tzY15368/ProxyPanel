@@ -23,7 +23,7 @@ func StartWorker() {
 		logrus.Fatal(err)
 	}
 
-	err = rpc.Startup()
+	err = rpc.RegisterSelf()
 	if err != nil {
 		// service should be unreachable if not registered
 		logrus.Fatal(err)

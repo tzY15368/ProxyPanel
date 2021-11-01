@@ -12,33 +12,28 @@ import (
 type LazarusService struct {
 }
 
-func (ls *LazarusService) DoInitialize(ctx context.Context, rr *RPCService.InitializeRequest) (res *RPCService.InitializeResponse, _err error) {
-	params, _err := servers.GetInitializeParams(rr.IP)
-	if _err != nil {
-		return nil, _err
-	}
-	res.Add = params.Add
-	res.Host = params.Host
-	return
-}
-
-func (ls *LazarusService) DoRegister(ctx context.Context, rr *RPCService.RegisterRequest) (_r *RPCService.RegisterResponse, _err error) {
-	_err = servers.RegisterServer(rr.IP)
-	if _err != nil {
-		return
+func (ls *LazarusService) DoRegister(ctx context.Context, rr *RPCService.RegisterRequest) (*RPCService.RegisterResponse, error) {
+	params, err := servers.RegisterServer(rr.IP)
+	if err != nil {
+		return nil, err
 	}
 	auth.ChangeAuthMap()
-	_r = &RPCService.RegisterResponse{
+	_r := &RPCService.RegisterResponse{
 		HeartBeatRateIntervalSec: int32(config.Cfg.HeartBeatRateIntervalSec),
 		HeartBeatErrorThres:      int32(config.Cfg.HeartBeatErrorThres),
+		Add:                      params.Add,
+		Host:                     params.Host,
 	}
-	return
+	return _r, nil
 }
 
-func (ls *LazarusService) DoHeartBeat(ctx context.Context, hbr *RPCService.HeartbeatRequest) (res *RPCService.HeartbeatResponse, err error) {
-	servers.RegisterHeartbeat(hbr.IP)
+func (ls *LazarusService) DoHeartBeat(ctx context.Context, hbr *RPCService.HeartbeatRequest) (*RPCService.HeartbeatResponse, error) {
+	err := servers.RegisterHeartbeat(hbr.IP)
+	if err != nil {
+		return nil, err
+	}
 	authMapDidChange := auth.AuthMapDidChange()
-	res = &RPCService.HeartbeatResponse{
+	res := &RPCService.HeartbeatResponse{
 		HasUpdate: authMapDidChange,
 	}
 	if authMapDidChange {
@@ -46,5 +41,5 @@ func (ls *LazarusService) DoHeartBeat(ctx context.Context, hbr *RPCService.Heart
 	} else {
 		res.Data = RPCService.UserData{}
 	}
-	return
+	return res, nil
 }

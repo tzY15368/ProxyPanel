@@ -34,44 +34,23 @@ func InitRPCClient() error {
 	rpcClient = RPCService.NewLazarusServiceClient(thrift.NewTStandardClient(iprot, oprot))
 	return nil
 }
-func Startup() (e error) {
-	e = mustInitializeServer()
-	if e != nil {
-		return
-	}
-	e = mustRegisterSelf()
-	if e != nil {
-		return
-	}
-	logrus.Info("registered self on master, starting service")
-	return
-}
-func mustInitializeServer() error {
-	res, err := rpcClient.DoInitialize(ctx, &RPCService.InitializeRequest{
+
+func RegisterSelf() error {
+	res, err := rpcClient.DoRegister(ctx, &RPCService.RegisterRequest{
 		IP: sysinfo.OutboundIP,
 	})
 	if err != nil {
 		return err
 	}
+	config.Cfg.HeartBeatErrorThres = int(res.HeartBeatErrorThres)
+	config.Cfg.HeartBeatRateIntervalSec = int(res.HeartBeatRateIntervalSec)
+
 	logrus.WithFields(logrus.Fields{
 		"add":  res.Add,
 		"host": res.Host,
 		"port": Port,
 	}).Info("got initialize params")
-
 	err = initialize.InitializeComponents(res.Add, res.Host, Port)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func mustRegisterSelf() error {
-	res, err := rpcClient.DoRegister(ctx, &RPCService.RegisterRequest{
-		IP: sysinfo.OutboundIP,
-	})
-	config.Cfg.HeartBeatErrorThres = int(res.HeartBeatErrorThres)
-	config.Cfg.HeartBeatRateIntervalSec = int(res.HeartBeatRateIntervalSec)
 	return err
 }
 
