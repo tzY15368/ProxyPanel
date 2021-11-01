@@ -7,14 +7,17 @@ import (
 
 var DB *gorm.DB
 
-func SetupDB(db string) (err error) {
+func SetupDB(db string) error {
 
-	DB, err = gorm.Open(sqlite.Open(db), &gorm.Config{})
+	_DB, err := gorm.Open(sqlite.Open(db), &gorm.Config{})
 	if err != nil {
-
 		return err
 	}
+	DB = _DB
 
-	DB.AutoMigrate(&User{})
+	err = DB.AutoMigrate(&User{}, &Servers{})
+	if err != nil {
+		return err
+	}
 	return nil
 }
