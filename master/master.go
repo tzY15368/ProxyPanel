@@ -61,6 +61,7 @@ func StartMaster() {
 	lazarus.GET("/s/json", handlers.LoginRequired, handlers.HandleSubscriptionJSON)
 	lazarus.GET("/s/:token", handlers.HandleSubscription)
 	lazarus.GET("/flush", handlers.LoginRequired, handlers.HandleTokenRefresh)
+	lazarus.GET("/create", handlers.HandleCreateServer)
 	externalG.NoRoute(func(c *gin.Context) { c.Redirect(http.StatusMovedPermanently, "/lazarus") })
 	go externalG.Run(webAddr)
 	logrus.Info("started master web server at", webAddr)

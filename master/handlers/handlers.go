@@ -94,3 +94,20 @@ func HandleTokenRefresh(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 	}
 }
+
+// http://127.0.0.1:1236/lazarus/create?ip=172.1.7.156&ps=icula&ipv6=
+func HandleCreateServer(c *gin.Context) {
+	csp := &servers.CreateServerParams{}
+	err := c.ShouldBind(csp)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = servers.CreateServer(csp)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	logrus.WithField("params", csp).Info("create server")
+	c.String(200, "ok")
+}

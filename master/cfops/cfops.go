@@ -2,6 +2,8 @@ package cfops
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"strings"
 
 	"github.com/cloudflare/cloudflare-go"
@@ -27,16 +29,26 @@ func InitCFApi() error {
 	return err
 }
 
-func RegisterIP(ip string) (domain string, err error) {
+func RegisterIP(ip string) (string, error) {
 	dType := "A"
 	// v6
 	if strings.Contains(ip, ":") {
 		dType = "AAAA"
 	}
-	res, err := api.CreateDNSRecord(ctx, zoneID, cloudflare.DNSRecord{Type: dType, Name: "test.fmagic.icu", Content: ip, TTL: TTL})
+	domain := hashIPToDomain(ip) + ".fmagic.icu"
+	res, err := api.CreateDNSRecord(ctx, zoneID, cloudflare.DNSRecord{Type: dType, Name: domain, Content: ip, TTL: TTL})
 	if err != nil {
-		return
+		return "", err
 	}
-	logrus.Infof("res: %v\n", res)
-	return
+	//logrus.Infof("res: %v\n", res)
+	logrus.WithField("success", res.Success).Info("domain creation result")
+	return domain, nil
+}
+func md5V(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
+}
+func hashIPToDomain(ip string) string {
+	return md5V(ip)[0:5]
 }

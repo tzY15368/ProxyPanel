@@ -10,6 +10,7 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.0.2-0.20210820200834-309d612d7095
 	github.com/google/uuid v1.3.0
+	github.com/mailgun/mailgun-go/v4 v4.5.3 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/shirou/gopsutil v3.21.9+incompatible
 	github.com/sirupsen/logrus v1.8.1
