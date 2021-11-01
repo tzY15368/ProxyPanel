@@ -43,6 +43,7 @@ func Startup() (e error) {
 	if e != nil {
 		return
 	}
+	logrus.Info("registered self on master, starting service")
 	return
 }
 func mustInitializeServer() error {
@@ -78,7 +79,7 @@ func SendHeartBeat() error {
 	cpu := sysinfo.GetCPUPercent()
 	mem := sysinfo.GetMemPercent()
 	res, err := rpcClient.DoHeartBeat(ctx, &RPCService.HeartbeatRequest{
-		IP:  sysinfo.GetMacAddr(),
+		IP:  sysinfo.OutboundIP,
 		CPU: &cpu,
 		Mem: &mem,
 	})

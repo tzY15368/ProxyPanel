@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/tzY15368/lazarus/config"
+	"github.com/tzY15368/lazarus/master/handlers/servers"
 	"github.com/tzY15368/lazarus/worker/auth"
 	"github.com/tzY15368/lazarus/worker/rpc"
 )
@@ -40,12 +42,15 @@ func StartWorker() {
 		for {
 			time.Sleep(time.Duration(config.Cfg.HeartBeatRateIntervalSec) * time.Second)
 			err := rpc.SendHeartBeat()
+			if errors.Is(err, servers.ErrServerNotFound) {
+				logrus.Fatal("desynced with master, restarting registry")
+			}
 			if err != nil {
 				errorCounter++
 				logrus.Error(err)
 			}
 			if errorCounter > config.Cfg.HeartBeatErrorThres {
-				logrus.Fatalf("error failed more than %s times", config.Cfg.HeartBeatErrorThres)
+				logrus.Fatalf("heartbeat rpc failed failed more than %d times", config.Cfg.HeartBeatErrorThres)
 			}
 		}
 	}()
