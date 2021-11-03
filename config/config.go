@@ -66,6 +66,8 @@ type WorkerCFG struct {
 }
 
 type MasterCFG struct {
+	CertEmail          string
+	DomainBase         string
 	Enabled            bool
 	Db                 string
 	Host               string
