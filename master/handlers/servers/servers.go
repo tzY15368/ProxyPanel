@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -11,6 +12,7 @@ import (
 	"github.com/tzY15368/lazarus/master/bot"
 	"github.com/tzY15368/lazarus/master/cfops"
 	"github.com/tzY15368/lazarus/master/models"
+	"gorm.io/gorm"
 )
 
 var ErrServerNotFound = errors.New("err server not found")
@@ -32,7 +34,7 @@ type CreateServerParams struct {
 func CreateServer(params *CreateServerParams) error {
 	sv := &models.Servers{}
 	tx := models.DB.Where("ip = ?", params.Ip).First(sv)
-	if tx.RowsAffected != 0 {
+	if !errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return ErrServerExists
 	}
 	// ssh到目标机上看看有没有docker和docker-compose
@@ -80,12 +82,22 @@ func CreateServer(params *CreateServerParams) error {
 // The service wont be available until the first heartbeat is received
 func RegisterServer(ip string) (*ServerConfigParmas, error) {
 	sv := &models.Servers{}
-	tx := models.DB.Model(sv).Where("ip = ?", ip).Updates(models.Servers{Registered: true, LastHeartBeat: time.Unix(0, 0)})
-	logrus.WithField("rows affected", tx.RowsAffected).WithField("ip", ip).Info("registered server")
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
+	err := models.DB.Transaction(func(tx *gorm.DB) error {
+		tx1 := tx.Where("ip=?", ip).First(sv)
+		if tx1.Error != nil {
+			return tx1.Error
+		}
 
+		tx2 := tx.Model(sv).Where("ip = ?", ip).Updates(models.Servers{Registered: true, LastHeartBeat: time.Unix(0, 0)})
+		return tx2.Error
+	})
+	if err != nil {
+		return nil, err
+	}
+	if sv.Add == "" {
+		return nil, ErrServerNotFound
+	}
+	logrus.WithField("host", sv.Host).Info("designated host")
 	csp := &ServerConfigParmas{
 		Add:  sv.Add,
 		Host: sv.Host,
@@ -95,9 +107,28 @@ func RegisterServer(ip string) (*ServerConfigParmas, error) {
 
 func RegisterHeartbeat(ip string) error {
 	sv := &models.Servers{}
-	tx := models.DB.Model(sv).Where("ip=?", ip).Updates(models.Servers{Ready: true, LastHeartBeat: time.Now()})
-	logrus.WithField("rows affected", tx.RowsAffected).WithField("ip", ip).Debug("registered heartbeat")
-	return tx.Error
+	serverBecameReady := false
+	err := models.DB.Transaction(func(tx *gorm.DB) error {
+		err := tx.Where("ip=?", ip).First(sv).Error
+		if err != nil {
+			return err
+		}
+		serverBecameReady = !sv.Ready
+		_tx := tx.Model(sv).Where("ip=?", ip).Updates(models.Servers{Ready: true, LastHeartBeat: time.Now()})
+		if _tx.Error != nil {
+			return _tx.Error
+		}
+
+		logrus.WithField("rows affected", _tx.RowsAffected).WithField("ip", ip).Debug("registered heartbeat")
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	if serverBecameReady {
+		go bot.SendMessageToGroup(fmt.Sprintf("%s(%s) 已注册", sv.Ps, sv.Host))
+	}
+	return nil
 }
 
 func GetValidServers() []models.Servers {
@@ -134,21 +165,30 @@ func StartTimeoutCheck() {
 			msg := ""
 
 			sv := &models.Servers{}
+			svs := []models.Servers{}
 			expireTime := time.Now().Add(-1 * time.Second * time.Duration(config.Cfg.HeartBeatErrorThres) * time.Duration(config.Cfg.HeartBeatRateIntervalSec))
-			tx := models.DB.Model(sv).Where("last_heart_beat < ?", expireTime).Where("ready = ?", true).Update("ready", false)
-			if tx.Error != nil {
-				logrus.WithError(tx.Error).Info("error while timeout check")
-			}
-			if tx.RowsAffected != 0 {
-				logrus.WithField("rows affected", tx.RowsAffected).Info("timeout check detected change")
-			}
-			if msg != "" {
-				go func() {
-					err := bot.SendMessageToGroup(msg)
-					if err != nil {
-						logrus.WithError(err).Warn("tgbot api send server delta failure")
+
+			// 返回error是否会是ErrRecordNotFound https://juejin.cn/post/6979915555939713054
+			models.DB.Transaction(func(tx *gorm.DB) error {
+
+				tx2 := tx.Where("last_heart_beat < ? and ready = ?", expireTime, true).Find(&svs)
+				if tx2.Error != nil && !errors.Is(gorm.ErrRecordNotFound, tx2.Error) {
+					logrus.WithError(tx.Error).Info("error while timeout check")
+					return tx2.Error
+				}
+				if len(svs) != 0 {
+					logrus.WithField("count", len(svs)).Warn("timeout check detected change")
+
+					tx3 := tx.Model(sv).Where("last_heart_beat < ?", expireTime).Where("ready = ?", true).Update("ready", false)
+					logrus.WithField("rows affected", tx3.RowsAffected).Info("removed timeout servers")
+					for _, _sv := range svs {
+						msg += fmt.Sprintf("%s(%s) 超时\n", _sv.Ps, _sv.Host)
 					}
-				}()
+				}
+				return nil
+			})
+			if msg != "" {
+				go bot.SendMessageToGroup(msg)
 			}
 			time.Sleep(2 * time.Second)
 		}

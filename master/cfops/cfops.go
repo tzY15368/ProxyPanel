@@ -35,7 +35,7 @@ func RegisterIP(ip string) (string, error) {
 	if strings.Contains(ip, ":") {
 		dType = "AAAA"
 	}
-	domain := hashIPToDomain(ip) + ".fmagic.icu"
+	domain := hashIPToDomain(ip) + "." + config.Cfg.Master.DomainBase
 	res, err := api.CreateDNSRecord(ctx, zoneID, cloudflare.DNSRecord{Type: dType, Name: domain, Content: ip, TTL: TTL})
 	if err != nil {
 		return "", err
