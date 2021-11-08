@@ -141,6 +141,17 @@ func GetValidServers() []models.Servers {
 	} else {
 		logrus.WithField("serverCount", len(servers)).Info("got ready server")
 	}
+	v6servers := make([]models.Servers, 0)
+	for _, server := range servers {
+		if server.HasIpv6 {
+			v6servers = append(v6servers, server)
+		}
+	}
+	for i := range v6servers {
+		v6servers[i].Host = "v6." + v6servers[i].Host
+		v6servers[i].Add = "v6." + v6servers[i].Add
+	}
+	servers = append(servers, v6servers...)
 	return servers
 }
 
