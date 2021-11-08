@@ -52,6 +52,8 @@ func CreateServer(params *CreateServerParams) error {
 	}
 
 	sv = &models.Servers{
+		Strict: true,
+
 		Ip:   params.Ip,
 		Tls:  "tls",
 		Add:  host,
@@ -171,7 +173,7 @@ func StartTimeoutCheck() {
 			// 返回error是否会是ErrRecordNotFound https://juejin.cn/post/6979915555939713054
 			models.DB.Transaction(func(tx *gorm.DB) error {
 
-				tx2 := tx.Where("last_heart_beat < ? and ready = ?", expireTime, true).Find(&svs)
+				tx2 := tx.Where("last_heart_beat < ? and ready = ? and strict = ?", expireTime, true, true).Find(&svs)
 				if tx2.Error != nil && !errors.Is(gorm.ErrRecordNotFound, tx2.Error) {
 					logrus.WithError(tx.Error).Info("error while timeout check")
 					return tx2.Error
@@ -179,7 +181,7 @@ func StartTimeoutCheck() {
 				if len(svs) != 0 {
 					logrus.WithField("count", len(svs)).Warn("timeout check detected change")
 
-					tx3 := tx.Model(sv).Where("last_heart_beat < ?", expireTime).Where("ready = ?", true).Update("ready", false)
+					tx3 := tx.Model(sv).Where("last_heart_beat < ? and ready = ? and strict = ?", expireTime, true, true).Update("ready", false)
 					logrus.WithField("rows affected", tx3.RowsAffected).Info("removed timeout servers")
 					for _, _sv := range svs {
 						msg += fmt.Sprintf("%s(%s) 超时\n", _sv.Ps, _sv.Host)

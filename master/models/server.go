@@ -7,6 +7,8 @@ import (
 )
 
 type Servers struct {
+	Strict bool `json:"-"`
+
 	gorm.Model `json:"-"`
 	Ip         string `json:"-" gorm:"uniqueIndex"`
 	Tls        string `json:"tls" `
