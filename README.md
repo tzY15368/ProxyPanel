@@ -1,21 +1,25 @@
 # Lazarus
 
+"""Call forth Lazurus from his cave, and resurrect the dead."""
+
+Proxy management server, with user interaction panel.
+
 提供管理多个服务器节点的面板与用户端
 
-## 主要功能
+## Main Functions 主要功能
 
-### 一阶段
+### Stage 1 一阶段
 
-- 通过nginx反向代理中增加lua脚本，基于本地worker检查用户订阅状态来支持多用户
-- 自动生成V2rayN、shadowrocket兼容的订阅
-- 用户面板中显示全部metadata：服务端在线数、总用量、443并发数……
+- Lua Scripts with Open-Resty to support user authentication on workers. 通过nginx反向代理中增加lua脚本，基于本地worker检查用户订阅状态来支持多用户
+- V2rayN & shadowrocket compatible subscription links generator. 自动生成V2rayN、shadowrocket兼容的订阅
+- A user panel to display statistics: concurrency on port 443, total online users, total data used... 用户面板中显示全部metadata：服务端在线数、总用量、443并发数……
 
-### 二阶段
+### Stage 2 二阶段
 
-- 配置其他机器key后自动部署v2ray,nginx和worker实例
-- terraform自动买机器扩容
-- 所有worker的域名为四级域名([WORKERID].xxx.xxx.xxx)，由master调cloudflare api实现动态解析，worker只需master的RPC地址即可工作，避免复杂配置  
-- dockerize，使扩容更容易
+- Auto deployment of v2ray, nginx and workers with ssh keys on designated servers. 配置其他机器key后自动部署v2ray,nginx和worker实例
+- Auto scaling with terraform. terraform自动买机器扩容
+- Dynamic naming service with Cloudflare DNS API. 所有worker的域名为四级域名([WORKERID].xxx.xxx.xxx)，由master调cloudflare api实现动态解析，worker只需master的RPC地址即可工作，避免复杂配置  
+- dockerize for easy deployments.
 
 ## 架构与实现细节
 
